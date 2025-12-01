@@ -6,9 +6,9 @@ typedef struct Usine {
 } Usine;
 
 
-typedef struct ArbreAVL_Usine {
+typedef struct AVL_Usine {
     Usine donnees;                 // Données de l'usine
     int hauteur;                   // Hauteur du nœud dans l'arbre AVL
-    struct ArbreAVL_Usine *gauche; // Sous-arbre gauche
-    struct ArbreAVL_Usine *droite; // Sous-arbre droit
-} ArbreAVL_Usine; // 
+    struct AVL_Usine *gauche; // Sous-arbre gauche
+    struct AVL_Usine *droite; // Sous-arbre droit
+} AVL_Usine; // 
