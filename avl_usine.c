@@ -7,8 +7,11 @@ if(u==NULL){
 
 u->id=id;
 u->capacite_max=capacite;
+u.volume_capte = 0;
+u.volume_reel = 0;
 
-
+return u;
+}
 
 
 
@@ -20,6 +23,7 @@ AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u){
 
 
 
+ 
 
 
 
