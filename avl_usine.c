@@ -1,12 +1,10 @@
 Usine creer_usine(const char *id, int capacite){
-Usine *u=malloc(sizeof(Usine));
-if(u==NULL){
-      printf("erreur d'allocation mémoire");
-      exit(1);
-}
+Usine u;
 
-u->id=id;
-u->capacite_max=capacite;
+
+
+u.id=id;
+u.capacite_max=capacite;
 u.volume_capte = 0;
 u.volume_reel = 0;
 
