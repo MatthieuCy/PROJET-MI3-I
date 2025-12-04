@@ -25,7 +25,7 @@ typedef struct AVL_Usine {
 Usine creer_usine(const char *id, int capacite);
 
 // Insertion dans un AVL
-AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u);
+AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u);zqd
 
 // Recherche d’une usine dans l’AVL
 AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id);
