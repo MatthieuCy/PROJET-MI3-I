@@ -65,7 +65,7 @@ void avl_supprimer(AVL_Usine *racine) {
         return;
     }
 
-    // Parcours en post-ordre : Gauche, Droite, Racine
+    // Parcours en postfixe : Gauche, Droite, Racine
     avl_supprimer(racine->gauche);
     avl_supprimer(racine->droite);
 
