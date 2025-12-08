@@ -20,6 +20,18 @@ typedef struct AVL_Usine {
 } AVL_Usine;
 
 // Fonctions principales 
+void lecture_ecriture_csv1();
+
+void lecture_ecriture_csv2();
+
+void lecture_ecriture_csv3();
+
+int hauteur(AVL_Usine *n);
+int facteur_equilibre(AVL_Usine *n);
+AVL_Usine *rotation_droite(AVL_Usine *y);
+AVL_Usine *rotation_gauche(AVL_Usine *x);
+AVL_Usine *equilibrer(AVL_Usine *racine); // Fonction qui gère les rotations
+
 
 // Création d'une usine
 Usine creer_usine(const char *id, int capacite);
