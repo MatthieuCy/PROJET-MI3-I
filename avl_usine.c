@@ -203,5 +203,8 @@ void avl_supprimer(AVL_Usine *racine) {
     // 2. Libérer le nœud AVL
     free(racine);
 }
+
+AVL_Usine *rotation_droite(AVL_Usine *y){
+       
   
-  
+}
