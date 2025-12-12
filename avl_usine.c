@@ -53,6 +53,7 @@ void lecture_ecriture_csv2(){
         exit(1);
         }
 
+    
     fprintf(fic2, "identifiant_usine;volume_source (k.m3.year-1)\n");
 
     char line[800];
@@ -115,6 +116,8 @@ void lecture_ecriture_csv3()
     fclose(fic);
     fclose(fic2);
 }
+
+
 int maxi(int a, int b){
     if(a>=b)    return a;
     return b;
@@ -174,9 +177,9 @@ AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
     if (comparaison == 0) {
         return racine; // Usine trouvée
     } else if (comparaison < 0) {
-        return avl_rechercher(racine->gauche, id); // Rechercher dans le sous-arbre gauche
+        return avl_rechercher(racine->gauche, id); //    Rechercher dans le sous-arbre gauche
     } else { // comparaison > 0
-        return avl_rechercher(racine->droite, id); // Rechercher dans le sous-arbre droit
+        return avl_rechercher(racine->droite, id); //   Rechercher dans le sous-arbre droit
     }
 }
 
