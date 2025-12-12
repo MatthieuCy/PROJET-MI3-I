@@ -205,6 +205,20 @@ void avl_supprimer(AVL_Usine *racine) {
 }
 
 AVL_Usine *rotation_droite(AVL_Usine *y){
-       
-  
+    AVL_Usine * pivot;
+    int eq_y, eq_p;
+
+    pivot = y->fg;
+    y->fg = pivot->fd;
+    pivot->fd = y;
+
+    eq_y = y->equilibre;
+    eq_p = pivot->equilibre;
+
+    y->equilibre = eq_y - min(eq_p, 0) +1;
+    pivot->equilibre = max(eq_y+2, eq_y+eq_p+2, eq_p+1);
+    y = pivot; 
+
+    return y;
 }
+  
