@@ -140,7 +140,12 @@ return u;
 }
 
 
-
+int get_facteur_equilibre(AVL_Usine *noeud) {
+    if (noeud == NULL) {
+        return 0;
+    }
+    return hauteur_noeud(noeud->gauche) - hauteur_noeud(noeud->droite);
+}
 
 
 AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
@@ -156,20 +161,15 @@ AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
     } else if (comparaison > 0) {
         racine->droite = avl_inserer(racine->droite, u);
     } else {
-        // ID déjà existant : mise à jour des données (ou ignorer)
-        // Libérer l'ID alloué dans u, car on utilise celui du nœud existant.
         free(u.id); 
-        // Mise à jour des autres données si nécessaire (ici on ignore)
         return racine; 
     }
-
-    // 2. Équilibrage de l'arbre
-    return equilibrer(racine);
+    return get_facteur_equilibre(racine);
 }
 
 AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
     if (racine == NULL) {
-        return NULL; // Usine non trouvée
+        return NULL; 
     }
 
     int comparaison = strcmp(id, racine->donnees.id);
@@ -192,33 +192,54 @@ void avl_supprimer(AVL_Usine *racine) {
     if (racine == NULL) {
         return;
     }
-
-    // Parcours en postfixe : Gauche, Droite, Racine
     avl_supprimer(racine->gauche);
     avl_supprimer(racine->droite);
 
-    // 1. Libérer l'ID de l'usine
+
     free(racine->donnees.id);
     
-    // 2. Libérer le nœud AVL
     free(racine);
 }
 
-AVL_Usine *rotation_droite(AVL_Usine *y){
-    AVL_Usine * pivot;
-    int eq_y, eq_p;
+int hauteur_noeud(AVL_Usine *noeud) {
+    if (noeud == NULL) {
+        return 0;
+    }
+    return noeud->hauteur;
+}
 
-    pivot = y->fg;
-    y->fg = pivot->fd;
-    pivot->fd = y;
 
-    eq_y = y->equilibre;
-    eq_p = pivot->equilibre;
+AVL_Usine *rotation_gauche(AVL_Usine *x) {
+    if (x == NULL || x->droite == NULL) {
+        return x; 
+    }
 
-    y->equilibre = eq_y - min(eq_p, 0) +1;
-    pivot->equilibre = max(eq_y+2, eq_y+eq_p+2, eq_p+1);
-    y = pivot; 
+    AVL_Usine *y = x->droite; 
+    AVL_Usine *T2 = y->gauche;
 
+    y->gauche = x; 
+    x->droite = T2;
+
+    x->hauteur = maxi(hauteur_noeud(x->gauche), hauteur_noeud(x->droite)) + 1;
+    y->hauteur = maxi(hauteur_noeud(y->gauche), hauteur_noeud(y->droite)) + 1;
     return y;
+}
+
+
+AVL_Usine *rotation_droite(AVL_Usine *y) {
+    if (y == NULL || y->gauche == NULL) {
+        return y;
+    }
+    
+    AVL_Usine *x = y->gauche;
+    AVL_Usine *T2 = x->droite;
+
+    y->gauche = T2;
+    x->droite = y;
+
+    y->hauteur = maxi(hauteur_noeud(y->gauche), hauteur_noeud(y->droite)) + 1;
+    x->hauteur = maxi(hauteur_noeud(x->gauche), hauteur_noeud(x->droite)) + 1;
+    
+    return x;
 }
   
