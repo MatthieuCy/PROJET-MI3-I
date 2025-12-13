@@ -1,122 +1,6 @@
-#include "AVL_USINE.H"
-
-
-
-void lecture_ecriture_csv1()
-{
-    const char* fichier = "c-wildwater_v3.dat";
-    FILE *fic = fopen(fichier, "r");
-
-    if (fic == NULL){
-        perror("fichier introuvable ou erreur d'ouverture");
-        exit(1);
-    }
-
-    FILE *fic2 = fopen("vol_max.dat", "w");
-    if (fic2 == NULL){
-        perror("fichier de sortie introuvable");
-        exit(1);
-    }
-
-    fprintf(fic2, "identifiant_usine;volume_max (k.m3.year-1)\n");
-
-    char line[800];
-    
-    char c1[50];      
-    char usine[50];        
-    char c3[50];        
-    char volume_max[50];  
-    char c5[50];        
-
-    while (fgets(line, sizeof(line), fic))
-    {
-        sscanf(line, "%49[^;];%49[^;];%49[^;];%49[^;];%49[^\n]",
-               c1, usine, c3, volume_max, c5);
-
-        
-        if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c5, "-") == 0)
-        {
-            fprintf(fic2, "%s;%s\n", usine, volume_max);
-        }
-    }
-
-    fclose(fic);
-    fclose(fic2);
-}
-void lecture_ecriture_csv2(){
-        
-    FILE *fic = fopen("c-wildwater_v3.dat", "r");
-    FILE *fic2 = fopen("vol_captation.txt", "w");
-
-    if (fic == NULL || fic2 == NULL){
-        perror("Erreur ouverture fichier");
-        exit(1);
-        }
-
-    
-    fprintf(fic2, "identifiant_usine;volume_source (k.m3.year-1)\n");
-
-    char line[800];
-    char c1[100], source[100], usine[100], volume[100], fuite[100];
-
-    while (fgets(line, sizeof(line), fic)){
-        sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]",
-               c1, source, usine, volume, fuite);
-
-        if (strcmp(c1, "-") == 0 && strcmp(volume, "-") != 0 && strcmp(fuite, "-") != 0){
-            fprintf(fic2, "%s;%s\n", usine, volume);
-        }
-    }
-
-    fclose(fic);
-    fclose(fic2);
-}
-
-void lecture_ecriture_csv3()
-{
-    const char* fichier = "c-wildwater_v3.dat";
-    FILE *fic = fopen(fichier, "r");
-
-    if (fic == NULL){
-        perror("fichier introuvable ou erreur d'ouverture");
-        exit(1);
-    }
-
-    FILE *fic2 = fopen("vol_traitement.tmp", "w");
-    if (fic2 == NULL){
-        perror("fichier de sortie introuvable");
-        exit(1);
-    }
-
-    fprintf(fic2, "identifiant_usine;volume_reel (k.m3.year-1)\n");
-
-    char line[800];
-    char c1[50], source[50], usine[50], volume[50], fuite[50];
-
-    double v, f, v_reel;
-
-    while (fgets(line, sizeof(line), fic))
-    {
-                
-        sscanf(line, "%49[^;];%49[^;];%49[^;];%49[^;];%49[^\n]",
-               c1, source, usine, volume, fuite);
-
-      
-        if (strcmp(c1, "-") == 0 && strcmp(volume, "-") != 0 && strcmp(fuite, "-") != 0)
-        {
-            v = atof(volume);  
-            f = atof(fuite);    
-
-            v_reel = v * (1 - (f / 100.0));
-
-            fprintf(fic2, "%s;%.2f\n", usine, v_reel);
-        }
-    }
-
-    fclose(fic);
-    fclose(fic2);
-}
-
+#define MAX_CHAMP_SIZE 100
+#define MAX_LINE_SIZE 1000
+#define FICHIER_DONNEES "c-wildwater_v3.dat"
 
 int maxi(int a, int b){
     if(a>=b)    return a;
@@ -290,4 +174,85 @@ AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
         return racine; 
     }
     return equilibrer(racine);
+}
+
+//Lit le fichier de données et construit un AVL contenant les usines.
+
+AVL_Usine *lire_donnees_et_construire_avl() {
+
+    // Ouverture du fichier de données en lecture
+    FILE *fic = fopen(FICHIER_DONNEES, "r");
+    if (fic == NULL) {
+        printf("ERREUR: Le fichier %s est introuvable \n", FICHIER_DONNEES);
+        return NULL;
+    }
+
+    AVL_Usine *racine = NULL;
+    char line[MAX_LINE_SIZE];
+
+    //stocker les 5 champs séparés par ';'
+    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE],
+         c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE],
+         c5[MAX_CHAMP_SIZE];
+
+    // Saut de la ligne d'en-tête (noms des colonnes) pour eviter decalage et erreur
+    if (fgets(line, sizeof(line), fic) == NULL) {
+        fclose(fic);
+        return NULL;
+    }
+
+    // Lecture du fichier ligne par ligne
+    while (fgets(line, sizeof(line), fic)) {
+
+        // Découpage de la ligne en 5 champs séparés par ';'
+        if (sscanf(line,
+                   "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]",
+                   c1, c2, c3, c4, c5) != 5) {
+            // Ligne mal formée : on l'ignore 
+            continue;
+        }
+
+        //CAS 1 : Définition d'une usine  et sa capa max
+        
+        if (strcmp(c1, "-") == 0 &&
+            strcmp(c3, "-") == 0 &&
+            strcmp(c5, "-") == 0) {
+
+            //  convertion de la capacite max  en nombre réel (double)
+            double capacite = atof(c4);
+
+            // Création de la structure Usine (ID + capacité max) puis  Insertion ou mise à jour de l'usine dans l'AVL
+            Usine u_payload = creer_usine(c2, capacite);
+            racine = avl_inserer(racine, u_payload);
+        }
+
+        // CAS 2 : SOURCE → USINE
+        
+        else if (strcmp(c1, "-") == 0 &&
+                 strcmp(c4, "-") != 0 &&
+                 strcmp(c5, "-") != 0) {
+
+            // Recherche de l'usine concernée dans l'AVL
+            AVL_Usine *noeud_usine = avl_rechercher(racine, c3);
+
+            // Si l'usine existe, on met à jour ses volumes
+            if (noeud_usine != NULL) {
+
+                // Conversion des valeurs numériques
+                double volume = atof(c4);
+                double fuite_pct = atof(c5);
+
+                // Calcul du volume réellement reçu après pertes
+                double volume_reel_traite =
+                    volume * (1.0 - (fuite_pct / 100.0));
+
+                // Accumulation des volumes dans l'usine
+                noeud_usine->donnees.volume_capte += volume;
+                noeud_usine->donnees.volume_reel += volume_reel_traite;
+            }
+        }
+    }
+    fclose(fic);
+
+    return racine;
 }
