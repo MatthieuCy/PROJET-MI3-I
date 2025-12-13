@@ -30,19 +30,18 @@ int hauteur(AVL_Usine *n);
 int facteur_equilibre(AVL_Usine *n);
 AVL_Usine *rotation_droite(AVL_Usine *y);
 AVL_Usine *rotation_gauche(AVL_Usine *x);
-AVL_Usine *equilibrer(AVL_Usine *racine); // Fonction qui gère les rotations
+AVL_Usine *equilibrer(AVL_Usine *racine); 
 
 
-// Création d'une usine
+
 Usine creer_usine(const char *id, int capacite);
 
-// Insertion dans un AVL
+
 AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u);zqd
 
-// Recherche d’une usine dans l’AVL
+
 AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id);
 
-// Libérer entièrement l’AVL
 void avl_supprimer(AVL_Usine *racine);
 
 #endif
