@@ -7,9 +7,9 @@
 
 typedef struct Usine {
     char *id;               // identifiant usine 
-    int capacite_max;       // capacité maximale 
-    long volume_capte;      // volume total capté 
-    long volume_reel;       // volume réellement traité 
+    double capacite_max;       // capacité maximale 
+    double volume_capte;      // volume total capté 
+    double volume_reel;       // volume réellement traité 
 } Usine;
 
 typedef struct AVL_Usine {
