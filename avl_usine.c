@@ -247,10 +247,11 @@ AVL_Usine *equilibrer(AVL_Usine *noeud) {
     return noeud;
 }
   
+
+
 AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
     if (racine == NULL) {
-        /
-        return creer_usine(u);
+        return creer_noeud_usine(u);
     }
 
     int comparaison = strcmp(u.id, racine->donnees.id);
@@ -260,7 +261,9 @@ AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
     } else if (comparaison > 0) {
         racine->droite = avl_inserer(racine->droite, u);
     } else {
-        free(u.id); 
+        if (u.capacite_max > racine->donnees.capacite_max) {
+             racine->donnees.capacite_max = u.capacite_max;
+        }        
         return racine; 
     }
     return equilibrer(racine);
