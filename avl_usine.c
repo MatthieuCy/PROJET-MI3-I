@@ -282,3 +282,28 @@ void parcourir_et_ecrire_inverse(AVL_Usine *noeud, FILE *fic) {
     parcourir_et_ecrire_inverse(noeud->gauche, fic);
 }
 
+
+// fonction  qui génère un fichier CSV à partir d’un AVL d’usines pourr tracer un histogramme des capacités et volumes traités.
+int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie) {
+    if (racine == NULL) {
+        printf("AVL vide, aucun histogramme genere.\n");
+        return 0;
+    }
+
+    // Ouverture du fichier de sortie en mode écriture
+    FILE *fic_out = fopen(nom_fichier_sortie, "w");
+    if (fic_out == NULL) {
+        printf("ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
+        return 2;
+    }
+
+    // Écriture de l'en-tête : le contenu de chaque colonne
+    fprintf(fic_out, "identifiant_usine;capacite_max (M.m3.year-1);volume_capte (M.m3.year-1);volume_reel (M.m3.year-1)\n");
+
+    // Lancement du parcours pour remplir le fichier
+    parcourir_et_ecrire_inverse(racine, fic_out);
+
+    fclose(fic_out);
+    return 0;
+}
+
