@@ -129,16 +129,39 @@ int mini(int a, int b){
 }
 
 
-Usine creer_usine(const char *id, double capacite){
-Usine u;
-u.id=id;
-u.capacite_max=capacite;
-u.volume_capte = 0.0;
-u.volume_reel = 0.0;
+Usine creer_usine(const char *id_source, double capacite) {
+    Usine u;
 
-return u;
+    u.id = strdup(id_source);
+    if (u.id == NULL) {
+       printf(" Erreur d'allocation memoire  \n ");
+        exit(1); 
+    }
+    
+    u.capacite_max = capacite;
+    u.volume_capte = 0.0;
+    u.volume_reel = 0.0;
+
+    return u;
 }
 
+AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
+    AVL_Usine *nouveau_noeud = (AVL_Usine *)malloc(sizeof(AVL_Usine));
+    
+    if (nouveau_noeud == NULL) { 
+        printf("Echec d'allocation memoire \n");
+        free(usine_donnees.id);
+        exit(1); 
+    }
+
+    nouveau_noeud->donnees = usine_donnees; 
+
+    nouveau_noeud->gauche = NULL;
+    nouveau_noeud->droite = NULL;
+    nouveau_noeud->hauteur = 1; 
+    
+    return nouveau_noeud;
+}
 
 int get_facteur_equilibre(AVL_Usine *noeud) {
     if (noeud == NULL) {
