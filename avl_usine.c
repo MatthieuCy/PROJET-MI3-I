@@ -270,3 +270,15 @@ void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
     // Écriture au format CSV avec deux décimales
     fprintf(fic, "%s;%.2f;%.2f;%.2f\n", noeud->donnees.id, capacite_mm3,capte_mm3,  reel_mm3);
 }
+
+
+//parcours infixe inverse pour avoir un tri alphabetique inverse
+void parcourir_et_ecrire_inverse(AVL_Usine *noeud, FILE *fic) {
+    if (noeud == NULL) {
+        return;
+    }
+    parcourir_et_ecrire_inverse(noeud->droite, fic);
+    ecrire_ligne_usine(fic, noeud);
+    parcourir_et_ecrire_inverse(noeud->gauche, fic);
+}
+
