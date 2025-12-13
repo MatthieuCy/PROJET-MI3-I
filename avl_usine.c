@@ -147,26 +147,6 @@ int get_facteur_equilibre(AVL_Usine *noeud) {
     return hauteur_noeud(noeud->gauche) - hauteur_noeud(noeud->droite);
 }
 
-
-AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
-    if (racine == NULL) {
-        /
-        return creer_usine(u);
-    }
-
-    int comparaison = strcmp(u.id, racine->donnees.id);
-
-    if (comparaison < 0) {
-        racine->gauche = avl_inserer(racine->gauche, u);
-    } else if (comparaison > 0) {
-        racine->droite = avl_inserer(racine->droite, u);
-    } else {
-        free(u.id); 
-        return racine; 
-    }
-    return get_facteur_equilibre(racine);
-}
-
 AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
     if (racine == NULL) {
         return NULL; 
@@ -177,14 +157,11 @@ AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
     if (comparaison == 0) {
         return racine; // Usine trouvée
     } else if (comparaison < 0) {
-        return avl_rechercher(racine->gauche, id); //    Rechercher dans le sous-arbre gauche
-    } else { // comparaison > 0
-        return avl_rechercher(racine->droite, id); //   Rechercher dans le sous-arbre droit
+        return avl_rechercher(racine->gauche, id); 
+    } else { 
+        return avl_rechercher(racine->droite, id); 
     }
 }
-
-
-
 
 
 }
@@ -194,10 +171,7 @@ void avl_supprimer(AVL_Usine *racine) {
     }
     avl_supprimer(racine->gauche);
     avl_supprimer(racine->droite);
-
-
-    free(racine->donnees.id);
-    
+    free(racine->donnees.id);  
     free(racine);
 }
 
@@ -242,4 +216,52 @@ AVL_Usine *rotation_droite(AVL_Usine *y) {
     
     return x;
 }
+
+AVL_Usine *equilibrer(AVL_Usine *noeud) {
+    if (noeud == NULL) {
+        return NULL;
+    }
+
+    noeud->hauteur = maxi(hauteur_noeud(noeud->gauche), hauteur_noeud(noeud->droite)) + 1;
+
+    int equilibre = get_facteur_equilibre(noeud);
+    
+    if (equilibre > 1 && get_facteur_equilibre(noeud->gauche) >= 0) {
+        return rotation_droite(noeud);
+    }
+
+    if (equilibre > 1 && get_facteur_equilibre(noeud->gauche) < 0) {
+        noeud->gauche = rotation_gauche(noeud->gauche);
+        return rotation_droite(noeud);
+    }
+
+    if (equilibre < -1 && get_facteur_equilibre(noeud->droite) <= 0) {
+        return rotation_gauche(noeud);
+    }
+
+    if (equilibre < -1 && get_facteur_equilibre(noeud->droite) > 0) {
+        noeud->droite = rotation_droite(noeud->droite);
+        return rotation_gauche(noeud);
+    }
+
+    return noeud;
+}
   
+AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
+    if (racine == NULL) {
+        /
+        return creer_usine(u);
+    }
+
+    int comparaison = strcmp(u.id, racine->donnees.id);
+
+    if (comparaison < 0) {
+        racine->gauche = avl_inserer(racine->gauche, u);
+    } else if (comparaison > 0) {
+        racine->droite = avl_inserer(racine->droite, u);
+    } else {
+        free(u.id); 
+        return racine; 
+    }
+    return equilibrer(racine);
+}
