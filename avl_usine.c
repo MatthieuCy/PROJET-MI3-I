@@ -1,6 +1,7 @@
 #define MAX_CHAMP_SIZE 100
 #define MAX_LINE_SIZE 1000
 #define FICHIER_DONNEES "c-wildwater_v3.dat"
+#define CONVERSION_KM3_TO_MM3 1000.0
 
 int maxi(int a, int b){
     if(a>=b)    return a;
@@ -255,4 +256,17 @@ AVL_Usine *lire_donnees_et_construire_avl() {
     fclose(fic);
 
     return racine;
+}
+
+// détermine comment  écrire la ligne (conversion et formatage correct).
+void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
+    if (noeud == NULL) return;
+
+    // le sujet nous demande la Conversion en Millions de m³ (M.m³)
+    double capacite_mm3 = noeud->donnees.capacite_max / CONVERSION_KM3_TO_MM3;
+    double capte_mm3 = noeud->donnees.volume_capte / CONVERSION_KM3_TO_MM3;
+    double reel_mm3 = noeud->donnees.volume_reel / CONVERSION_KM3_TO_MM3;
+
+    // Écriture au format CSV avec deux décimales
+    fprintf(fic, "%s;%.2f;%.2f;%.2f\n", noeud->donnees.id, capacite_mm3,capte_mm3,  reel_mm3);
 }
