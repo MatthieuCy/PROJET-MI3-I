@@ -306,3 +306,55 @@ int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie) {
     return 0;
 }
 
+
+// Calcule  quantité totale d'eau perdue par fuite 
+double calculer_fuites_totales() {
+
+    // Ouverture du fichier de données en lecture
+    FILE *fic = fopen(FICHIER_DONNEES, "r");
+    if (fic == NULL) {
+        printf("ERREUR: Le fichier %s est introuvable.\n", FICHIER_DONNEES);
+        return -1.0;
+    }
+
+    // Accumulateur des fuites totales
+    double fuites_totales = 0.0;
+
+    //stocker les 5 champs séparés par ';'
+    char line[MAX_LINE_SIZE];
+    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE],c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE],c5[MAX_CHAMP_SIZE];
+
+    // Saut de la ligne d'en-tête (noms des colonnes) pour eviter decalage et erreur
+    if (fgets(line, sizeof(line), fic) == NULL) {
+        fclose(fic);
+        return 0.0;
+    }
+
+    // Lecture du fichier ligne par ligne
+    while (fgets(line, sizeof(line), fic)) {
+
+        // Découpage de la ligne en 5 champs séparés par ';'
+        if (sscanf(line,
+                   "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]",
+                   c1, c2, c3, c4, c5) != 5) {
+            continue;
+        }
+
+        // fuite calculable si le volume brut et pourcentage de fuite sont présents
+        if (strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
+
+            // Conversion des valeurs  en nombres 
+            double volume_brut = atof(c4);
+            double fuite_pct   = atof(c5);
+
+            // Calcul de la fuite associée à cette ligne
+            double fuite_actuelle = volume_brut * (fuite_pct / 100.0);
+            fuites_totales += fuite_actuelle;
+        }
+    }
+
+    fclose(fic);
+
+    return fuites_totales;
+}
+
