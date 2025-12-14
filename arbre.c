@@ -40,7 +40,7 @@ Arbre_Graphe_AVL *avl_graphe_nouveau_noeud(char *id, Arbre_Noeud *noeud) {
     return n;
 }
 
-Arbre_Graphe_AVL *rotation_droite(Arbre_Graphe_AVL *y) {
+NoeudAVL* rotation_droite(Arbre_Graphe_AVL *y) {
     Arbre_Graphe_AVL *x = y->gauche;
     Arbre_Graphe_AVL *T2 = x->droite;
     x->droite = y;
@@ -50,7 +50,7 @@ Arbre_Graphe_AVL *rotation_droite(Arbre_Graphe_AVL *y) {
     return x;
 }
 
-Arbre_Graphe_AVL *rotation_gauche(Arbre_Graphe_AVL *x) {
+NoeudAVL* rotation_gauche(Arbre_Graphe_AVL *x) {
     Arbre_Graphe_AVL *y = x->droite;
     Arbre_Graphe_AVL *T2 = y->gauche;
     y->gauche = x;
@@ -66,8 +66,7 @@ int avl_graphe_facteur_equilibre(Arbre_Graphe_AVL *n) {
     }
     return  avl_graphe_hauteur(n->gauche)   - avl_graphe_hauteur(n->droite);
 }
-
-Arbre_Graphe_AVL *equilibrer(Arbre_Graphe_AVL *n) {
+NoeudAVL* equilibrer(Arbre_Graphe_AVL *n) {
     if (!n) return n;
 
     n->hauteur = 1 + maxi(avl_graphe_hauteur(n->gauche),avl_graphe_hauteur(n->droite));
