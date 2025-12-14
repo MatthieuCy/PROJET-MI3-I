@@ -122,6 +122,9 @@ Noeud_AVL_Recherche* equilibrer_noeud(Noeud_AVL_Recherche *n) {
 }
 
 Noeud_Acteur* creer_noeud_acteur(const char *id, const char *id_usine) {
+    if (id == NULL || id_usine == NULL) {
+    return NULL;
+    }
     Noeud_Acteur *acteur = (Noeud_Acteur*) malloc(sizeof(Noeud_Acteur));
     if (acteur == NULL) {
         return NULL; 
