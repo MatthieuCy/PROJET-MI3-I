@@ -25,6 +25,12 @@ typedef struct Noeud_AVL_Recherche {
     struct Noeud_AVL_Recherche *droite;
 } Noeud_AVL_Recherche;
 
+typedef struct Graphe_Global {
+    // La racine de l'AVL de recherche (pour trouver les noeuds par ID rapidement)
+    Noeud_AVL_Recherche *racine_avl; 
+    Noeud_Acteur *usine_cible;
+} Graphe_Global;
+
 
 Noeud_AVL_Recherche* creer_noeud_avl(const char *id_acteur_key, Noeud_Acteur *adresse_noeud) {
     Noeud_AVL_Recherche *nouveau_noeud = (Noeud_AVL_Recherche*) malloc(sizeof(Noeud_AVL_Recherche));
@@ -166,4 +172,22 @@ int ajouter_troncon_aval(Noeud_Acteur *parent, Noeud_Acteur *enfant, double fuit
     parent->nombre_enfants++;
     
     return 0; // Succès
+}
+
+Noeud_AVL_Recherche* inserer_avl(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud) {
+    if (noeud == NULL) {
+        return creer_noeud_avl(id_acteur_key, adresse_noeud);
+    }
+    
+    int comparaison = strcmp(id_acteur_key, noeud->id_acteur_key);
+
+    if (comparaison < 0) {
+        noeud->gauche = inserer_avl(noeud->gauche, id_acteur_key, adresse_noeud);
+    } else if (comparaison > 0) {
+        noeud->droite = inserer_avl(noeud->droite, id_acteur_key, adresse_noeud);
+    } else {
+        return noeud;
+    }
+
+    return equilibrer_noeud(noeud);
 }
