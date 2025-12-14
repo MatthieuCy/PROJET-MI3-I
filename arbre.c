@@ -174,3 +174,55 @@ int ajouter_troncon(Arbre_Noeud *source, Arbre_Graphe_AVL *racine_avl, char *cib
 
     return 0; 
 }
+
+
+void supprimer_troncons(Chainon_Troncon *tete) {
+    Chainon_Troncon *courant = tete;
+    Chainon_Troncon *suivant = NULL;
+    
+    while (courant != NULL) {
+        suivant = courant->suivant;
+        free(courant);
+        courant = suivant;
+    }
+}
+
+void supprimer_arbre_noeud(Arbre_Noeud *n) {
+    if (n == NULL) return;
+
+    supprimer_troncons(n->troncons_aval);
+    if (n->id != NULL) {
+        free(n->id);
+    }
+    free(n);
+}
+
+void avl_graphe_suppression(Arbre_Graphe_AVL *racine) {
+    if (racine == NULL) return;
+
+    avl_graphe_suppression(racine->gauche);
+    avl_graphe_suppression(racine->droite);
+
+    if (racine->id != NULL) {
+        free(racine->id);
+    }
+
+    free(racine);
+}
+
+void supprimer_noeuds_depuis_avl(Arbre_Graphe_AVL *racine) {
+    if (racine == NULL) return;
+
+    supprimer_noeuds_depuis_avl(racine->gauche);
+    supprimer_noeuds_depuis_avl(racine->droite);
+
+    supprimer_arbre_noeud(racine->noeud);
+}
+
+
+void supprimer_graphe_complet(Arbre_Graphe_AVL *racine_avl) {
+    if (racine_avl == NULL) return;
+
+    supprimer_noeuds_depuis_avl(racine_avl);
+    avl_graphe_suppression(racine_avl);
+}
