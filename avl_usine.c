@@ -244,8 +244,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
                 double fuite_pct = atof(c5);
 
                 // Calcul du volume réellement reçu après pertes
-                double volume_reel_traite =
-                    volume * (1.0 - (fuite_pct / 100.0));
+                double volume_reel_traite =  volume * (1.0 - (fuite_pct / 100.0));
 
                 // Accumulation des volumes dans l'usine
                 noeud_usine->donnees.volume_capte += volume;
