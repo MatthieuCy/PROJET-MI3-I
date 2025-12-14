@@ -192,9 +192,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
     char line[MAX_LINE_SIZE];
 
     //stocker les 5 champs séparés par ';'
-    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE],
-         c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE],
-         c5[MAX_CHAMP_SIZE];
+    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
 
     // Saut de la ligne d'en-tête (noms des colonnes) pour eviter decalage et erreur
     if (fgets(line, sizeof(line), fic) == NULL) {
@@ -207,17 +205,14 @@ AVL_Usine *lire_donnees_et_construire_avl() {
 
         // Découpage de la ligne en 5 champs séparés par ';'
         if (sscanf(line,
-                   "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]",
-                   c1, c2, c3, c4, c5) != 5) {
+                   "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
             // Ligne mal formée : on l'ignore 
             continue;
         }
 
         //CAS 1 : Définition d'une usine  et sa capa max
         
-        if (strcmp(c1, "-") == 0 &&
-            strcmp(c3, "-") == 0 &&
-            strcmp(c5, "-") == 0) {
+        if (strcmp(c1, "-") == 0 &&  strcmp(c3, "-") == 0 &&  strcmp(c5, "-") == 0) {
 
             //  convertion de la capacite max  en nombre réel (double)
             double capacite = atof(c4);
@@ -229,9 +224,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
 
         // CAS 2 : SOURCE → USINE
         
-        else if (strcmp(c1, "-") == 0 &&
-                 strcmp(c4, "-") != 0 &&
-                 strcmp(c5, "-") != 0) {
+        else if (strcmp(c1, "-") == 0 &&  strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
 
             // Recherche de l'usine concernée dans l'AVL
             AVL_Usine *noeud_usine = avl_rechercher(racine, c3);
