@@ -116,13 +116,14 @@ Arbre_Noeud *avl_graphe_recherche(Arbre_Graphe_AVL *racine, char *id) {
     return avl_graphe_recherche(racine->droite, id);
 }
 
-Arbre_Noeud *creer_arbre_noeud(char *id) {
-    Arbre_Noeud *n = (Arbre_Noeud *)malloc(sizeof(Arbre_Noeud));
-    if (n== NULL){
-        return NULL;
-    } 
+NoeudAVL *creer_noeud_avl(const char *id, void *data) {
+    NoeudAVL *n = (NoeudAVL *)malloc(sizeof(NoeudAVL));
+    if (!n) return NULL;
+
     n->id = strdup(id);
-    n->troncons_aval = NULL; 
+    n->data = data; 
+    n->gauche = n->droite = NULL;
+    n->hauteur = 1;
     return n;
 }
 
