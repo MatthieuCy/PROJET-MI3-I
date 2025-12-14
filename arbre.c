@@ -107,6 +107,16 @@ Arbre_Graphe_AVL *avl_graphe_insertion(Arbre_Graphe_AVL *racine, char *id, Arbre
     return equilibrer(racine);
 }
 
+
+void *rechercher_avl(NoeudAVL *racine, const char *id) {
+    if (!racine) return NULL;
+
+    int cmp = strcmp(id, racine->id);
+    if (cmp == 0) return racine->data;
+    if (cmp < 0)  return rechercher_avl(racine->gauche, id);
+    return rechercher_avl(racine->droite, id);
+}
+
 Arbre_Noeud *avl_graphe_recherche(Arbre_Graphe_AVL *racine, char *id) {
     if (!racine) return NULL;
 
