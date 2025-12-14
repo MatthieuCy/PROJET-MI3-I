@@ -226,3 +226,5 @@ void supprimer_graphe_complet(Arbre_Graphe_AVL *racine_avl) {
     supprimer_noeuds_depuis_avl(racine_avl);
     avl_graphe_suppression(racine_avl);
 }
+
+
