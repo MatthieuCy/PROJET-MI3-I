@@ -116,3 +116,61 @@ Arbre_Noeud *avl_graphe_recherche(Arbre_Graphe_AVL *racine, char *id) {
     if (cmp < 0)  return avl_graphe_recherche(racine->gauche, id);
     return avl_graphe_recherche(racine->droite, id);
 }
+
+Arbre_Noeud *creer_arbre_noeud(char *id) {
+    Arbre_Noeud *n = (Arbre_Noeud *)malloc(sizeof(Arbre_Noeud));
+    if (n== NULL){
+        return NULL;
+    } 
+    n->id = strdup(id);
+    n->troncons_aval = NULL; 
+    return n;
+}
+
+Arbre_Graphe_AVL *creer_et_inserer_noeud(Arbre_Graphe_AVL *racine_avl, char *id_noeud) {
+    Arbre_Noeud *existant = avl_graphe_recherche(racine_avl, id_noeud);
+    if (existant) {
+        return racine_avl;  // déjà présent
+    }
+
+    Arbre_Noeud *nouveau = creer_arbre_noeud(id_noeud);
+    if (!nouveau) return racine_avl;
+
+    return avl_graphe_insertion(racine_avl, id_noeud, nouveau);
+}
+
+
+Chainon_Troncon *creer_chainon_troncon(double fuite_pct, Arbre_Noeud *cible) {
+    Chainon_Troncon *troncon = (Chainon_Troncon *)malloc(sizeof(Chainon_Troncon));
+    if (troncon == NULL){
+        return NULL; 
+    }
+    troncon->fuite_pct = fuite_pct;
+    troncon->cible = cible; 
+    troncon->suivant = NULL;
+    return troncon;
+}
+
+
+int ajouter_troncon(Arbre_Noeud *source, Arbre_Graphe_AVL *racine_avl, char *cible_id, double fuite_pct) {
+    if (!source || !racine_avl) {
+        return -1; 
+    }
+    
+    Arbre_Noeud *cible = avl_graphe_recherche(racine_avl, cible_id);
+    
+    if (cible == NULL) {
+        printf("Erreur : Nœud cible '%s' introuvable dans l'index AVL.\n", cible_id);
+        return -1;
+    }
+
+    Chainon_Troncon *nouveau_troncon = creer_chainon_troncon(fuite_pct, cible);
+    if (!nouveau_troncon) {
+        return -1; 
+    }
+   
+    nouveau_troncon->suivant = source->troncons_aval;
+    source->troncons_aval = nouveau_troncon;
+
+    return 0; 
+}
