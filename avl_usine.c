@@ -358,3 +358,16 @@ double calculer_fuites_totales() {
     return fuites_totales;
 }
 
+//Affiche les fuites totales du réseau après conversion
+void afficher_fuites_totales() {
+
+    double fuites_km3 = calculer_fuites_totales();
+
+    if (fuites_km3 < 0.0) {
+        return;
+    }
+
+    double fuites_mm3 = fuites_km3 / CONVERSION_KM3_TO_MM3;
+
+    printf("Fuites totales dans le reseau : %.2f M.m3/an \n",fuites_mm3);
+}
