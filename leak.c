@@ -252,3 +252,51 @@ Graphe_Global* construire_graphe_distribution() {
     fclose(fic);
     return graphe;
 }
+
+
+int compter_stockages(Noeud_AVL_Recherche *avl_noeud_recherche, const char *id_usine_cible) {
+    if (avl_noeud_recherche == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    Noeud_Acteur *acteur = avl_noeud_recherche->adresse_noeud;
+    
+    // si stockage et appartient à l'usine 
+    if (strncmp(acteur->id_acteur, "Storage", 7) == 0 && strcmp(acteur->id_usine_parent, id_usine_cible) == 0) {
+        count = 1;
+    }
+
+    // parcours infixe
+    count += compter_stockages(avl_noeud_recherche->gauche, id_usine_cible);
+    count += compter_stockages(avl_noeud_recherche->droite, id_usine_cible);
+
+    return count;
+}
+
+
+
+void propager_volume_et_calculer_pertes(Noeud_Acteur *noeud_courant, double volume_entrant_total, double *total_pertes) {
+
+    if (noeud_courant == NULL || noeud_courant->nombre_enfants == 0) {
+        return; 
+    }
+
+    // répartition equitable du volume entre les enfants
+    double volume_par_troncon = volume_entrant_total / (double)noeud_courant->nombre_enfants;
+
+    Troncon_Enfant *troncon = noeud_courant->troncons_aval;
+
+    while (troncon != NULL) {
+
+        double fuite_pct = troncon->fuite_pct;
+        double volume_perdu_troncon = volume_par_troncon * (fuite_pct / 100.0);
+        double volume_transmis_troncon = volume_par_troncon - volume_perdu_troncon;
+
+        *total_pertes += volume_perdu_troncon;
+
+        propager_volume_et_calculer_pertes(troncon->acteur_aval, volume_transmis_troncon, total_pertes);
+
+        troncon = troncon->suivant;
+    }
+}
