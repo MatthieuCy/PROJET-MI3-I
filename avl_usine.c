@@ -210,7 +210,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
             continue;
         }
 
-        //CAS 1 : Définition d'une usine  et sa capa max
+        //Cas 1 : Définition d'une usine  et sa capa max
         
         if (strcmp(c1, "-") == 0 &&  strcmp(c3, "-") == 0 &&  strcmp(c5, "-") == 0) {
 
@@ -222,7 +222,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
             racine = avl_inserer(racine, u_payload);
         }
 
-        // CAS 2 : SOURCE → USINE
+        // Cas 2 : source ->usine
         
         else if (strcmp(c1, "-") == 0 &&  strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
 
@@ -250,7 +250,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
     return racine;
 }
 
-// détermine comment  écrire la ligne (conversion et formatage correct).
+// Détermine comment  écrire la ligne (conversion et formatage correct).
 void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
     if (noeud == NULL) return;
 
@@ -264,7 +264,7 @@ void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
 }
 
 
-//parcours infixe inverse pour avoir un tri alphabetique inverse
+//Parcours infixe inverse pour avoir un tri alphabetique inverse
 void parcourir_et_ecrire_inverse(AVL_Usine *noeud, FILE *fic) {
     if (noeud == NULL) {
         return;
@@ -275,7 +275,7 @@ void parcourir_et_ecrire_inverse(AVL_Usine *noeud, FILE *fic) {
 }
 
 
-// fonction  qui génère un fichier CSV à partir d’un AVL d’usines pourr tracer un histogramme des capacités et volumes traités.
+// Fonction  qui génère un fichier CSV à partir d’un AVL d’usines pourr tracer un histogramme des capacités et volumes traités.
 int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie) {
     if (racine == NULL) {
         printf("AVL vide, aucun histogramme genere.\n");
