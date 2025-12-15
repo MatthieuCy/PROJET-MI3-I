@@ -255,9 +255,9 @@ void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
     if (noeud == NULL) return;
 
     // le sujet nous demande la conversion en millions de m³
-    double capacite_mm3 = noeud->donnees.capacite_max * CONVERSION_KM3_TO_MM3;
-    double capte_mm3 = noeud->donnees.volume_capte * CONVERSION_KM3_TO_MM3;
-    double reel_mm3 = noeud->donnees.volume_reel * CONVERSION_KM3_TO_MM3;
+    double capacite_mm3 = noeud->donnees.capacite_max / CONVERSION_KM3_TO_MM3;
+    double capte_mm3 = noeud->donnees.volume_capte / CONVERSION_KM3_TO_MM3;
+    double reel_mm3 = noeud->donnees.volume_reel / CONVERSION_KM3_TO_MM3;
 
     // Écriture au format CSV avec deux décimales
     fprintf(fic, "%s;%.2f;%.2f;%.2f\n", noeud->donnees.id, capacite_mm3,capte_mm3,  reel_mm3);
