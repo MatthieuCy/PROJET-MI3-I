@@ -300,3 +300,68 @@ void propager_volume_et_calculer_pertes(Noeud_Acteur *noeud_courant, double volu
         troncon = troncon->suivant;
     }
 }
+
+void parcourir_stockages_et_propager(Noeud_AVL_Recherche *avl_noeud_recherche, const char *id_usine_cible, double volume_par_stockage, double *total_pertes) {
+    if (avl_noeud_recherche == NULL) {
+        return;
+    }
+
+    parcourir_stockages_et_propager(avl_noeud_recherche->gauche, id_usine_cible, volume_par_stockage, total_pertes);
+
+    Noeud_Acteur *acteur = avl_noeud_recherche->adresse_noeud;
+
+    // "Storage" a 7 caractères , strncmp compare les N premiers caractères de deux chaînes
+    if (strncmp(acteur->id_acteur, "Storage", 7) == 0 && strcmp(acteur->id_usine_parent, id_usine_cible) == 0) {
+        propager_volume_et_calculer_pertes(acteur, volume_par_stockage, total_pertes);
+    }
+
+    parcourir_stockages_et_propager(avl_noeud_recherche->droite, id_usine_cible, volume_par_stockage, total_pertes);
+}
+
+
+
+double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_usine_avl, Graphe_Global *graphe, const char *nom_fichier_sortie) {
+    
+    AVL_Usine *noeud_usine = avl_rechercher(racine_usine_avl, id_usine);
+    double volume_depart_km3 = 0.0;
+    double total_pertes_km3 = 0.0; // Accumulation en k.m³ (milliers de m³)
+
+    if (noeud_usine != NULL) {
+        volume_depart_km3 = noeud_usine->donnees.volume_reel;
+        
+        int nb_stockages = compter_stockages(graphe->racine_avl, id_usine);
+
+        if (nb_stockages > 0) {
+            double volume_par_stockage = volume_depart_km3 / (double)nb_stockages;
+            parcourir_stockages_et_propager(graphe->racine_avl, id_usine, volume_par_stockage, &total_pertes_km3);
+        }
+    }
+
+    FILE *fic_out = fopen(nom_fichier_sortie, "a+");
+    if (fic_out == NULL) { 
+        printf("ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
+        return -2.0; 
+    }
+
+    fseek(fic_out, 0, SEEK_END);
+    if (ftell(fic_out) == 0) {
+        fprintf(fic_out, "identifiant;Volume_perdu (M.m3.year-1)\n");
+    }
+    
+    double volume_perdu_mm3 = total_pertes_km3 / CONVERSION_KM3_TO_MM3;
+
+    if (noeud_usine == NULL) {
+        fprintf(fic_out, "%s;-1.00\n", id_usine);
+        fclose(fic_out);
+        return -1.0;
+    } else {
+        fprintf(fic_out, "%s;%.2f\n", id_usine, volume_perdu_mm3); 
+    }
+    
+    fclose(fic_out);
+
+    return volume_perdu_mm3;
+}
+
+
+
