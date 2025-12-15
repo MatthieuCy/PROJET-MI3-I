@@ -195,6 +195,7 @@ Noeud_AVL_Recherche* inserer_avl(Noeud_AVL_Recherche *noeud, const char *id_acte
 Graphe_Global* construire_graphe_distribution() {
     Graphe_Global *graphe = (Graphe_Global*) malloc(sizeof(Graphe_Global));
     if (graphe == NULL) {
+        printf("erreur echec d'allocution memoire \n");
         return NULL;
     }
     graphe->racine_avl = NULL;
@@ -202,6 +203,7 @@ Graphe_Global* construire_graphe_distribution() {
 
     FILE *fic = fopen(FICHIER_DONNEES, "r");
     if (fic == NULL) {
+        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de données %s.\n", FICHIER_DONNEES);
         free(graphe);
         return NULL;
     }
@@ -209,44 +211,59 @@ Graphe_Global* construire_graphe_distribution() {
     char line[MAX_LINE_SIZE];
     char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
 
+ 
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
         return graphe;
     }
 
+    //  Lecture ligne par ligne et construction du graphe
     while (fgets(line, sizeof(line), fic)) {
+        // Lire 5 champs séparés par des ';'
         if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
+            continue; 
+        }
+        
+
+        if (strcmp(c1, "-") == 0 && strcmp(c5, "-") == 0) {
             continue;
         }
-        
-        // cas 1 : usine->stockage
-        if (strcmp(c1, "-") == 0 && strcmp(c2, "Facility complex") == 0 && strcmp(c5, "-") != 0) {
+
+        // Cas 1 : Usine -> Stockage 
+        else if (strcmp(c1, "-") != 0 && strcmp(c2, "Facility complex") == 0 && strcmp(c5, "-") != 0) {
             
-            Noeud_Acteur *stockage = creer_noeud_acteur(c3, c2); 
+            Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
             if (stockage == NULL) break;
             
-            graphe->racine_avl = inserer_avl(graphe->racine_avl, c3, stockage); 
+
+            graphe->racine_avl = inserer_avl(graphe->racine_avl, c3, stockage);
             if (graphe->racine_avl == NULL) break;
+        
         }
         
-        // cas 2 : autre cas
+        // Cas 2 : Autres tronçons 
         else if (strcmp(c1, "-") != 0 && strcmp(c5, "-") != 0) {
-            
+        
             Noeud_Acteur *parent_acteur = rechercher_avl(graphe->racine_avl, c2);
             
             if (parent_acteur == NULL) { 
                 continue;
             }
 
+
             Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
             if (enfant_acteur == NULL) break;
+
 
             graphe->racine_avl = inserer_avl(graphe->racine_avl, c3, enfant_acteur);
             if (graphe->racine_avl == NULL) break;
 
+        
             double fuite_pct = atof(c5);
             if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
         } 
+        
+   
     }
     
     fclose(fic);
