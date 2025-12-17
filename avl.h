@@ -6,6 +6,11 @@
 #include <string.h>
 #include <stddef.h>
 
+#define MAX_CHAMP_SIZE 100
+#define MAX_LINE_SIZE 1000
+#define FICHIER_DONNEES "c-wildwater_v3.dat"
+#define CONVERSION_KM3_TO_MM3 1000.0
+
 typedef struct Usine {
     char *id;               // identifiant usine 
     double capacite_max;       // capacité maximale 
@@ -15,12 +20,13 @@ typedef struct Usine {
 
 typedef struct AVL_Usine {
     Usine donnees;                // données associées à l’usine
-    int hauteur;                  // hauteur du nœud AVL
+    int equilibre;                // equilibre du nœud AVL
     struct AVL_Usine *gauche;    // sous-arbre gauche
     struct AVL_Usine *droite;    // sous-arbre droit
 } AVL_Usine;
 
-struct Arbre_Graphe_AVL;
+struct Arbre_Noeud;
+
 
 typedef struct Chainon_Troncon {
     double fuite_pct;                 // Pourcentage de fuite sur ce tronçon
@@ -38,10 +44,14 @@ typedef struct Arbre_Noeud {
 typedef struct Arbre_Graphe_AVL {
     char *id;                          // ID de l'installation (clé de l'AVL)
     Arbre_Noeud *noeud;                // Pointeur vers le nœud réel (la donnée)
-    int hauteur;
+    int equilibre;
     struct Arbre_Graphe_AVL *gauche;
     struct Arbre_Graphe_AVL *droite;
 } Arbre_Graphe_AVL;
+
+
+struct Noeud_Acteur;
+
 
 typedef struct Troncon_Enfant {
     double fuite_pct;      // Pourcentage fuites du tronçon (colonne 5)
@@ -49,22 +59,22 @@ typedef struct Troncon_Enfant {
     struct Troncon_Enfant *suivant;
 } Troncon_Enfant;
 
+
 typedef struct Noeud_Acteur {
     char *id_acteur;            
     char *id_usine_parent;      
-  
     double volume_entrant;      
     double volume_perdu_absolu; 
-    
     struct Noeud_Acteur *parent; 
     Troncon_Enfant *troncons_aval; 
     int nombre_enfants;               
 } Noeud_Acteur;
 
+
 typedef struct Noeud_AVL_Recherche {
     char *id_acteur_key;          
     Noeud_Acteur *adresse_noeud;  
-    int hauteur;                  
+    int equilibre;                  
     struct Noeud_AVL_Recherche *gauche;
     struct Noeud_AVL_Recherche *droite;
 } Noeud_AVL_Recherche;
@@ -88,12 +98,14 @@ int ajouter_troncon(Arbre_Noeud *source, Arbre_Graphe_AVL *racine_avl, char *cib
 // Fonctions de manipulation de l'AVL du Graphe
 int avl_graphe_hauteur(Arbre_Graphe_AVL *n);
 Arbre_Graphe_AVL *avl_graphe_nouveau_noeud(char *id, Arbre_Noeud *noeud);
-Arbre_Graphe_AVL *rotation_droite(Arbre_Graphe_AVL *y);
-Arbre_Graphe_AVL *rotation_gauche(Arbre_Graphe_AVL *x);
-int avl_graphe_facteur_equilibre(Arbre_Graphe_AVL *n);
+Arbre_Graphe_AVL *rotation_droite_graphe(Arbre_Graphe_AVL *y);
+Arbre_Graphe_AVL *rotation_gauche_graphe(Arbre_Graphe_AVL *x);
+Arbre_Graphe_AVL *double_rotation_gauche_graphe(Arbre_Graphe_AVL *a);
+Arbre_Graphe_AVL *double_rotation_droite_graphe(Arbre_Graphe_AVL *a);
+int avl_facteur_equilibre_graphe(Arbre_Graphe_AVL *n);
 Arbre_Graphe_AVL *equilibrer_graphe(Arbre_Graphe_AVL *n); 
-Arbre_Graphe_AVL *avl_graphe_insertion(Arbre_Graphe_AVL *racine, char *id, Arbre_Noeud *noeud);
-Arbre_Noeud *avl_graphe_recherche(Arbre_Graphe_AVL *racine, char *id);
+Arbre_Graphe_AVL *avl_inserer_graphe(Arbre_Graphe_AVL *racine, char *id, Arbre_Noeud *noeud, int *h);
+Arbre_Noeud *avl_rechercher_graphe(Arbre_Graphe_AVL *racine, char *id);
 Arbre_Graphe_AVL *creer_et_inserer_noeud(Arbre_Graphe_AVL *racine_avl, char *id_noeud);
 
 // Fonctions de libération de mémoire du Graphe
@@ -109,14 +121,16 @@ void supprimer_graphe_complet(Arbre_Graphe_AVL *racine_avl);
 // Fonctions de gestion de l'AVL des Usines
 Usine creer_usine(const char *id_source, double capacite);
 AVL_Usine *creer_noeud_usine(Usine usine_donnees);
-int hauteur_noeud(AVL_Usine *noeud);
-int get_facteur_equilibre(AVL_Usine *noeud);
+int hauteur_noeud_usine(AVL_Usine *noeud);
+int avl_facteur_equilibre_usine(AVL_Usine *noeud);
 AVL_Usine *rotation_gauche_usine(AVL_Usine *x); 
 AVL_Usine *rotation_droite_usine(AVL_Usine *y); 
+AVL_Usine *double_rotation_gauche_usine(AVL_Usine *a);
+AVL_Usine *double_rotation_droite_usine(AVL_Usine *a);
 AVL_Usine *equilibrer_usine(AVL_Usine *noeud);  
-AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u);
-AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id);
-void avl_supprimer(AVL_Usine *racine); // Libération mémoire
+AVL_Usine *avl_inserer_usine(AVL_Usine *racine, Usine u, int *h);
+AVL_Usine *avl_rechercher_usine(AVL_Usine *racine, const char *id);
+void avl_supprimer_usine(AVL_Usine *racine); // Libération mémoire
 
 // Fonctions de lecture et sortie
 AVL_Usine *lire_donnees_et_construire_avl();
