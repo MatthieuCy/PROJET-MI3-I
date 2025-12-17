@@ -28,10 +28,7 @@ cleanup_and_exit() {
     duration_ns=$(( end_time - start_time ))
     duration_ms=$(( duration_ns / 1000000 ))
     
-    echo ""
-    echo "---------------------------------------------------------"
     echo "Duree totale d'execution: ${duration_ms} ms"
-    echo "---------------------------------------------------------"
     exit "$exit_code"
 }
 
