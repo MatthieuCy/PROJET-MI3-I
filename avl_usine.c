@@ -2,6 +2,7 @@
 #define MAX_LINE_SIZE 1000
 #define FICHIER_DONNEES "c-wildwater_v3.dat"
 #define CONVERSION_KM3_TO_MM3 1000.0
+#include "avl.h"
 
 int maxi(int a, int b){
     if(a>=b)    return a;
