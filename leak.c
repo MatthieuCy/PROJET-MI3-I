@@ -380,5 +380,29 @@ double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_u
     return volume_perdu_mm3;
 }
 
+void liberer_avl_recherche(Noeud_AVL_Recherche *n) {
+    if (n == NULL) return;
+    liberer_avl_recherche(n->gauche);
+    liberer_avl_recherche(n->droite);
+
+    if (n->adresse_noeud != NULL) {
+        Troncon_Enfant *courant = n->adresse_noeud->troncons_aval;
+        while (courant != NULL) {
+            Troncon_Enfant *temp = courant;
+            courant = courant->suivant;
+            free(temp);
+        }
+        free(n->adresse_noeud->id_acteur);
+        free(n->adresse_noeud->id_usine_parent);
+        free(n->adresse_noeud);
+    }
+    free(n->id_acteur_key);
+    free(n);
+}
+void liberer_graphe_complet(Graphe_Global *graphe) {
+    if (graphe == NULL) return;
+    liberer_avl_recherche(graphe->racine_avl);
+    free(graphe);
+}
 
 
