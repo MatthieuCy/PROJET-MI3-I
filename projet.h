@@ -76,8 +76,7 @@ void supprimer_noeuds_depuis_avl(Arbre_Graphe_AVL *racine);
 void supprimer_graphe_complet(Arbre_Graphe_AVL *racine_avl);
 
 
-// PROTOTYPES - AVL_USINE.C (Manipulation de l'AVL des usines)
-
+// PROTOTYPES - AVL_USINE.C 
 
 // Fonctions de gestion de l'AVL des Usines
 Usine creer_usine(const char *id_source, double capacite);
@@ -97,7 +96,6 @@ int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie);
 
 
 
-// PROTOTYPES -
 
 double calculer_fuites(Arbre_Graphe_AVL *racine_graphe_avl, const char *id_usine);
 int historique_fuites(const char *nom_fichier, const char *id_usine, double fuites_pct);
