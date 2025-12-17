@@ -298,5 +298,22 @@ int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie) {
     fclose(fic_out);
     return 0;
 }
+void liberer_avl_usine(AVL_Usine *racine) {
+    if (racine == NULL) return;
+    liberer_avl_usine(racine->gauche);
+    liberer_avl_usine(racine->droite);
+    if (racine->donnees.id != NULL) {
+        free(racine->donnees.id);
+    }
+    free(racine);
+}
 
+void liberer_troncons(Chainon_Troncon *debut) {
+    Chainon_Troncon *courant = debut;
+    while (courant != NULL) {
+        Chainon_Troncon *a_supprimer = courant;
+        courant = courant->suivant;
+        free(a_supprimer);
+    }
+}
 
