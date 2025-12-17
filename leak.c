@@ -1,35 +1,3 @@
-typedef struct Troncon_Enfant {
-    double fuite_pct;      // Pourcentage fuites du tronçon (colonne 5)
-    struct Noeud_Acteur *acteur_aval; 
-    struct Troncon_Enfant *suivant;
-} Troncon_Enfant;
-
-typedef struct Noeud_Acteur {
-    char *id_acteur;            
-    char *id_usine_parent;      
-  
-    double volume_entrant;      
-    double volume_perdu_absolu; 
-    
-    struct Noeud_Acteur *parent; 
-    Troncon_Enfant *troncons_aval; 
-    int nombre_enfants;               
-} Noeud_Acteur;
-
-typedef struct Noeud_AVL_Recherche {
-    char *id_acteur_key;          
-    Noeud_Acteur *adresse_noeud;  
-    
-    int hauteur;                  
-    struct Noeud_AVL_Recherche *gauche;
-    struct Noeud_AVL_Recherche *droite;
-} Noeud_AVL_Recherche;
-
-typedef struct Graphe_Global {
-    // La racine de l'AVL de recherche (pour trouver les noeuds par ID rapidement)
-    Noeud_AVL_Recherche *racine_avl; 
-    Noeud_Acteur *usine_cible;
-} Graphe_Global;
 
 
 Noeud_AVL_Recherche* creer_noeud_avl(const char *id_acteur_key, Noeud_Acteur *adresse_noeud) {
