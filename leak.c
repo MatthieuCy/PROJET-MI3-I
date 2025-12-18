@@ -349,7 +349,7 @@ void parcourir_stockages_et_propager(Noeud_AVL_Recherche *avl_noeud_recherche, c
 
 double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_usine_avl, Graphe_Global *graphe, const char *nom_fichier_sortie) {
     
-    AVL_Usine *noeud_usine = avl_rechercher(racine_usine_avl, id_usine);
+    AVL_Usine *noeud_usine = avl_rechercher_usine(racine_usine_avl, id_usine);
     double volume_depart_km3 = 0.0;
     double total_pertes_km3 = 0.0; // Accumulation en k.m³ (milliers de m³)
 
