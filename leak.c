@@ -154,28 +154,28 @@ Noeud_AVL_Recherche *double_rotation_droite_graphe(Noeud_AVL_Recherche *a) {
 }
 
 
-Noeud_AVL_Recherche *equilibrer_graphe(Noeud_AVL_Recherche *noeud) {
-    if (noeud == NULL) {
+Noeud_AVL_Recherche *equilibrer_graphe(Noeud_AVL_Recherche *n ) {
+    if (n == NULL) {
         return NULL;
     }
     
-    if (noeud->equilibre >= 2) {
-        if (noeud->droite->equilibre >=0) {
-             return rotation_gauche_graphe(noeud);
+    if (n->equilibre >= 2) {
+        if (n->droite->equilibre >=0) {
+             return rotation_gauche_graphe(n);
         } 
         else {
-            return double_rotation_gauche_graphe(noeud);
+            return double_rotation_gauche_graphe(n);
         }
     } 
-    else if (noeud->equilibre <= -2) {
-        if(noeud->gauche->equilibre <=0) {
-             return rotation_droite_graphe(noeud);
+    else if (n->equilibre <= -2) {
+        if(n->gauche->equilibre <=0) {
+             return rotation_droite_graphe(n);
         }
         else {
-             return double_rotation_droite_graphe(noeud);
+             return double_rotation_droite_graphe(n);
         }     
     }
-    return noeud;
+    return n;
 }  
 
 
