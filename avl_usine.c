@@ -2,13 +2,13 @@
 
 
 
-int maxi(int a, int b) {
+static int maxi(int a, int b) {
     if (a >= b)
         return a;
     return b;
 }
 
-int mini(int a, int b) {
+static int mini(int a, int b) {
     if (a <= b)
         return a;
     return b;
