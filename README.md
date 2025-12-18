@@ -25,8 +25,8 @@ Le projet repose sur :
 
 
 
-├── myscipt.sh                 # Script principal
-   plot_histo.plt              #Génération des histogrammes
+├── myscipt.sh             # Script principal
+   plot_histo.plt          #Génération des histogrammes
 ├── README.md              # Documentation
 │   ├── Makefile
 │   ├── avl.c / avl.h      # Arbres AVL et Histogrammes
