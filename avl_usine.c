@@ -40,7 +40,7 @@ AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
 
     nouveau_noeud->gauche = NULL;
     nouveau_noeud->droite = NULL;
-    nouveau_noeud->hauteur = 1; 
+    nouveau_noeud->equilibre = 0; 
     
     return nouveau_noeud;
 }
