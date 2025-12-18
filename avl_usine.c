@@ -246,10 +246,10 @@ void avl_supprimer(AVL_Usine *racine) {
 
 //Lit le fichier de données et construit un AVL contenant les usines.
 
-AVL_Usine *lire_donnees_et_construire_avl() {
+AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
 
     // Ouverture du fichier de données en lecture
-    FILE *fic = fopen(FICHIER_DONNEES, "r");
+    FILE *fic = fopen(nom_fichier, "r");
     if (fic == NULL) {
         printf("ERREUR: Le fichier %s est introuvable \n", FICHIER_DONNEES);
         return NULL;
