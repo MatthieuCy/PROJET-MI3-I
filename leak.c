@@ -259,18 +259,19 @@ Noeud_AVL_Recherche *avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *
 }
 
 
-Graphe_Global* construire_graphe_distribution() {
+Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
     Graphe_Global *graphe = (Graphe_Global*) malloc(sizeof(Graphe_Global));
     if (graphe == NULL) {
-        printf("erreur echec d'allocution memoire \n");
+        fprintf(stderr, "Erreur : échec d'allocation mémoire pour le Graphe_Global\n");
         return NULL;
     }
     graphe->racine_avl = NULL;
     graphe->usine_cible = NULL;
 
-    FILE *fic = fopen(FICHIER_DONNEES, "r");
+   
+    FILE *fic = fopen(nom_fichier, "r");
     if (fic == NULL) {
-        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de données %s.\n", FICHIER_DONNEES);
+        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier %s.\n", nom_fichier);
         free(graphe);
         return NULL;
     }
@@ -279,44 +280,39 @@ Graphe_Global* construire_graphe_distribution() {
     char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
     int h = 0;
  
+    // Saut de la ligne d'entête
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
         return graphe;
     }
 
-    //  Lecture ligne par ligne et construction du graphe
     while (fgets(line, sizeof(line), fic)) {
-        // Lire 5 champs séparés par des ';'
         if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
             continue; 
         }
-        
 
         if (strcmp(c1, "-") == 0 && strcmp(c5, "-") == 0) {
             continue;
         }
 
-        // Cas 1 : Usine -> Stockage 
-        else if (strcmp(c1, "-") != 0 && strcmp(c2, "Facility complex") == 0 && strcmp(c5, "-") != 0) {
-            
+        // Cas 1 : Usine -> Premier acteur 
+        if (strcmp(c1, "-") != 0 && strcmp(c2, "Facility complex") == 0 && strcmp(c5, "-") != 0) {
             Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
             if (stockage == NULL) break;
             
             h = 0;
+    
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, stockage, &h);
             if (graphe->racine_avl == NULL) break;
-        
         }
         
-        // Cas 2 : Autres tronçons 
+        // Cas 2 : Autres acteurs dans la chaîne de distribution
         else if (strcmp(c1, "-") != 0 && strcmp(c5, "-") != 0) {
-        
             Noeud_Acteur *parent_acteur = rechercher_avl(graphe->racine_avl, c2);
             
             if (parent_acteur == NULL) { 
                 continue;
             }
-
 
             Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
             if (enfant_acteur == NULL) break;
@@ -325,12 +321,9 @@ Graphe_Global* construire_graphe_distribution() {
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
             if (graphe->racine_avl == NULL) break;
 
-        
             double fuite_pct = atof(c5);
             if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
-        } 
-        
-   
+        }    
     }
     
     fclose(fic);
