@@ -140,8 +140,7 @@ Graphe_Global *construire_graphe_distribution(const char *nom_fichier);
 
 
 
-
-double calculer_fuites(Arbre_Graphe_AVL *racine_graphe_avl, const char *id_usine);
+double calculer_rendement_distribution(const char *id_cible, AVL_Usine *racine_usine, Graphe_Global *graphe, const char *fichier_historique);
 int historique_fuites(const char *nom_fichier, const char *id_usine, double fuites_pct);
 void lire_donnees_et_construire_graphe(Arbre_Graphe_AVL **racine_graphe_avl, AVL_Usine *racine_usine_avl);
 
