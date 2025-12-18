@@ -14,7 +14,7 @@ Il permet notamment :
 - l’export des résultats sous forme de fichiers CSV et de graphiques PNG.
 
 Le projet repose sur :
-- un*script Shell (`myscript.sh`) pour l’orchestration,
+- un script Shell (`myscript.sh`) pour l’orchestration,
 - plusieurs programmes en C
 - Gnuplot pour la visualisation graphique.
 
