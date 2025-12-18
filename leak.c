@@ -37,10 +37,10 @@ Noeud_Acteur* rechercher_avl(Noeud_AVL_Recherche *racine, const char *id_acteur_
     }
 }
 
-int maxi(int a, int b) {
+static int maxi(int a, int b) {
     return (a > b) ? a : b;
 }
-int mini(int a, int b) {
+static int mini(int a, int b) {
     return (a < b) ? a : b;
 }
 
