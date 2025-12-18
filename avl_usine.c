@@ -2,7 +2,7 @@
 
 
 
-int maxi(int a, int b, int c) {
+static int maxi(int a, int b, int c) {
     int m = a;
 
     if (b > m)
@@ -13,7 +13,7 @@ int maxi(int a, int b, int c) {
     return m;
 }
 
-int mini(int a, int b, int c) {
+static int mini(int a, int b, int c) {
     int m = a;
 
     if (b < m)
@@ -21,6 +21,22 @@ int mini(int a, int b, int c) {
     if (c < m)
         m = c;
 
+    return m;
+}
+
+// Fonction pour trouver le maximum entre trois entiers
+static int max_trois(int a, int b, int c) {
+    int m = a;
+    if (b > m) m = b;
+    if (c > m) m = c;
+    return m;
+}
+
+// Fonction pour trouver le minimum entre trois entiers
+static int min_trois(int a, int b, int c) {
+    int m = a;
+    if (b < m) m = b;
+    if (c < m) m = c;
     return m;
 }
 
@@ -99,7 +115,7 @@ AVL_Usine *rotation_gauche_usine(AVL_Usine *a) {
     eq_p = pivot->equilibre;
 
     a->equilibre = eq_a - maxi(eq_p, 0) - 1;
-    pivot->equilibre = mini(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
+    pivot->equilibre = min_trois(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
 
     a = pivot;
     return a;
@@ -122,7 +138,7 @@ AVL_Usine *rotation_droite_usine(AVL_Usine *a) {
     eq_p = pivot->equilibre;
 
     a->equilibre = eq_a - mini(eq_p, 0) + 1;
-    pivot->equilibre = maxi(eq_a + 2, eq_a + eq_p + 2, eq_p + 1);
+    pivot->equilibre = max_trois(eq_a + 2, eq_a + eq_p + 2, eq_p + 1);
 
     a = pivot;
     return a;
