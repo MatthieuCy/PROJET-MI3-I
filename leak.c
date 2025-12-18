@@ -1,5 +1,31 @@
 #include "avl.h"
 
+
+static int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+
+static int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+static int maxi_trois(int a, int b, int c) {
+    int m = a;
+    if (b > m) m = b;
+    if (c > m) m = c;
+    return m;
+}
+
+// Fonction pour trouver le minimum entre trois entiers
+static int mini_trois(int a, int b, int c) {
+    int m = a;
+    if (b < m) m = b;
+    if (c < m) m = c;
+    return m;
+}
+
+
 Noeud_AVL_Recherche* creer_noeud_avl(const char *id_acteur_key, Noeud_Acteur *adresse_noeud) {
     Noeud_AVL_Recherche *nouveau_noeud = (Noeud_AVL_Recherche*) malloc(sizeof(Noeud_AVL_Recherche));
     
@@ -21,6 +47,7 @@ Noeud_AVL_Recherche* creer_noeud_avl(const char *id_acteur_key, Noeud_Acteur *ad
     return nouveau_noeud;
 }
 
+
 Noeud_Acteur* rechercher_avl(Noeud_AVL_Recherche *racine, const char *id_acteur_key) {
     if (racine == NULL) {
         return NULL;
@@ -37,27 +64,7 @@ Noeud_Acteur* rechercher_avl(Noeud_AVL_Recherche *racine, const char *id_acteur_
     }
 }
 
-static int max(int a, int b) {
-    return (a > b) ? a : b;
-}
-static int min(int a, int b) {
-    return (a < b) ? a : b;
-}
 
-static int maxi_trois(int a, int b, int c) {
-    int m = a;
-    if (b > m) m = b;
-    if (c > m) m = c;
-    return m;
-}
-
-// Fonction pour trouver le minimum entre trois entiers
-static int mini_trois(int a, int b, int c) {
-    int m = a;
-    if (b < m) m = b;
-    if (c < m) m = c;
-    return m;
-}
 int avl_recherche_hauteur(Noeud_AVL_Recherche *n) {
     if (n == NULL)
         return 0;
@@ -71,40 +78,6 @@ int avl_recherche_hauteur(Noeud_AVL_Recherche *n) {
         return 1 + hd;
 }
 
-Noeud_AVL_Recherche* rotation_droite(Noeud_AVL_Recherche *y) {
-    if (y == NULL || y->gauche == NULL)
-        return y;
-
-    Noeud_AVL_Recherche *x = y->gauche;
-    Noeud_AVL_Recherche *T2 = x->droite; 
-    x->droite = y;
-    y->gauche = T2;
-    int eq_y = y->equilibre;
-    int eq_x = x->equilibre;
-
-    y->equilibre = eq_y - min(eq_x, 0) + 1;
-    x->equilibre = maxi_trois(eq_y + 2, eq_y + eq_x + 2, eq_x + 1);
-
-    return x;
-}
-
-
-Noeud_AVL_Recherche* rotation_gauche(Noeud_AVL_Recherche *x) {
-    if (x == NULL || x->droite == NULL)
-        return x;
-
-    Noeud_AVL_Recherche *y = x->droite;
-    Noeud_AVL_Recherche *T2 = y->gauche;
-    y->gauche = x;
-    x->droite = T2;
-    int eq_x = x->equilibre;
-    int eq_y = y->equilibre;
-
-    x->equilibre = eq_x - max(eq_y, 0) - 1;
-    y->equilibre = mini_trois(eq_x - 2, eq_x + eq_y - 2, eq_y - 1);
-
-    return y;
-}
 
 int avl_recherche_facteur_equilibre(Noeud_AVL_Recherche *n) {
     if(n == NULL){
@@ -113,29 +86,97 @@ int avl_recherche_facteur_equilibre(Noeud_AVL_Recherche *n) {
     return avl_recherche_hauteur(n->gauche) - avl_recherche_hauteur(n->droite);
 }
 
-Noeud_AVL_Recherche* equilibrer_noeud(Noeud_AVL_Recherche *n) {
-    if (!n) return n;
 
-    int eq = avl_recherche_facteur_equilibre(n);
-
-    if (eq > 1 && avl_recherche_facteur_equilibre(n->gauche) >= 0)
-        return rotation_droite(n);
-    
-    if (eq > 1 && avl_recherche_facteur_equilibre(n->gauche) < 0) {
-        n->gauche = rotation_gauche(n->gauche);
-        return rotation_droite(n);
-    }
-    
-    if (eq < -1 && avl_recherche_facteur_equilibre(n->droite) <= 0)
-        return rotation_gauche(n);
-    
-    if (eq < -1 && avl_recherche_facteur_equilibre(n->droite) > 0) {
-        n->droite = rotation_droite(n->droite);
-        return rotation_gauche(n);
+Noeud_AVL_Recherche* rotation_droite_graphe(Noeud_AVL_Recherche *a) {
+    if (a == NULL || a->gauche == NULL) {
+        return a;
     }
 
-    return n;
+    Noeud_AVL_Recherche *pivot;
+    int eq_a, eq_p;
+
+    pivot = a->gauche;
+    a->gauche = pivot->droite;
+    pivot->droite = a;
+
+    eq_a = a->equilibre;
+    eq_p = pivot->equilibre;
+
+    a->equilibre = eq_a - min(eq_p, 0) + 1;
+    pivot->equilibre = maxi_trois(eq_a + 2, eq_a + eq_p + 2, eq_p + 1);
+
+    a = pivot;
+    return a;
 }
+
+
+Noeud_AVL_Recherche* rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
+    if (a == NULL || a->droite == NULL) {
+        return a;
+    } 
+    
+    Noeud_AVL_Recherche *pivot;
+    int eq_a, eq_p;
+
+    pivot = a->droite;
+    a->droite = pivot->gauche;
+    pivot->gauche = a;
+
+    eq_a = a->equilibre;
+    eq_p = pivot->equilibre;
+
+    a->equilibre = eq_a - max(eq_p, 0) - 1;
+    pivot->equilibre = mini_trois(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
+
+    a = pivot;
+    return a;
+}
+
+
+Noeud_AVL_Recherche* double_rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
+    if (a == NULL || a->droite == NULL) {
+        return a;
+    }
+    
+    a->droite = rotation_droite_graphe(a->droite);
+    return rotation_gauche_graphe(a);
+}
+
+
+Noeud_AVL_Recherche* double_rotation_droite_graphe(Noeud_AVL_Recherche *a) {
+    if (a == NULL || a->gauche == NULL) {
+        return a;
+    }
+    
+    a->gauche = rotation_gauche_graphe(a->gauche);
+    return rotation_droite_graphe(a);
+}
+
+
+Noeud_AVL_Recherche* equilibrer_graphe(Noeud_AVL_Recherche *noeud) {
+    if (noeud == NULL) {
+        return NULL;
+    }
+    
+    if (noeud->equilibre >= 2) {
+        if (noeud->droite->equilibre >=0) {
+             return rotation_gauche_graphe(noeud);
+        } 
+        else {
+            return double_rotation_gauche_graphe(noeud);
+        }
+    } 
+    else if (noeud->equilibre <= -2) {
+        if(noeud->gauche->equilibre <=0) {
+             return rotation_droite_graphe(noeud);
+        }
+        else {
+             return double_rotation_droite_graphe(noeud);
+        }     
+    }
+    return noeud;
+}  
+
 
 Noeud_Acteur* creer_noeud_acteur(const char *id, const char *id_usine) {
     if (id == NULL || id_usine == NULL) {
@@ -165,6 +206,7 @@ Noeud_Acteur* creer_noeud_acteur(const char *id, const char *id_usine) {
     return acteur;
 }
 
+
 int ajouter_troncon_aval(Noeud_Acteur *parent, Noeud_Acteur *enfant, double fuite_pct) {
     Troncon_Enfant *nouveau_troncon = (Troncon_Enfant*) malloc(sizeof(Troncon_Enfant));
     if (nouveau_troncon == NULL) {
@@ -184,23 +226,38 @@ int ajouter_troncon_aval(Noeud_Acteur *parent, Noeud_Acteur *enfant, double fuit
     return 0; // Succès
 }
 
-Noeud_AVL_Recherche* inserer_avl(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud) {
+
+Noeud_AVL_Recherche* avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h) {
     if (noeud == NULL) {
+        *h = 1;
         return creer_noeud_avl(id_acteur_key, adresse_noeud);
     }
     
     int comparaison = strcmp(id_acteur_key, noeud->id_acteur_key);
 
     if (comparaison < 0) {
-        noeud->gauche = inserer_avl(noeud->gauche, id_acteur_key, adresse_noeud);
+        noeud->gauche = avl_inserer_graphe(noeud->gauche, id_acteur_key, adresse_noeud, h);
+        *h = -(*h);
     } else if (comparaison > 0) {
-        noeud->droite = inserer_avl(noeud->droite, id_acteur_key, adresse_noeud);
+        noeud->droite = avl_inserer_graphe(noeud->droite, id_acteur_key, adresse_noeud, h);
     } else {
+        *h = 0;
         return noeud;
     }
 
-    return equilibrer_noeud(noeud);
+    if (*h != 0) {
+        noeud->equilibre += *h;
+        noeud = equilibrer_graphe(noeud);
+        if (noeud->equilibre == 0) {
+            *h = 0;
+        }
+        else {
+            *h = 1;
+        }
+    }
+    return noeud;
 }
+
 
 Graphe_Global* construire_graphe_distribution() {
     Graphe_Global *graphe = (Graphe_Global*) malloc(sizeof(Graphe_Global));
@@ -220,7 +277,7 @@ Graphe_Global* construire_graphe_distribution() {
 
     char line[MAX_LINE_SIZE];
     char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
-
+    int h = 0;
  
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
@@ -245,8 +302,8 @@ Graphe_Global* construire_graphe_distribution() {
             Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
             if (stockage == NULL) break;
             
-
-            graphe->racine_avl = inserer_avl(graphe->racine_avl, c3, stockage);
+            h = 0;
+            graphe->racine_avl = inserer_avl_graphe(graphe->racine_avl, c3, stockage, &h);
             if (graphe->racine_avl == NULL) break;
         
         }
@@ -264,8 +321,8 @@ Graphe_Global* construire_graphe_distribution() {
             Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
             if (enfant_acteur == NULL) break;
 
-
-            graphe->racine_avl = inserer_avl(graphe->racine_avl, c3, enfant_acteur);
+            h = 0;
+            graphe->racine_avl = inserer_avl_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
             if (graphe->racine_avl == NULL) break;
 
         
@@ -327,6 +384,7 @@ void propager_volume_et_calculer_pertes(Noeud_Acteur *noeud_courant, double volu
         troncon = troncon->suivant;
     }
 }
+
 
 void parcourir_stockages_et_propager(Noeud_AVL_Recherche *avl_noeud_recherche, const char *id_usine_cible, double volume_par_stockage, double *total_pertes) {
     if (avl_noeud_recherche == NULL) {
@@ -390,6 +448,7 @@ double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_u
     return volume_perdu_mm3;
 }
 
+
 void liberer_avl_recherche(Noeud_AVL_Recherche *n) {
     if (n == NULL) return;
     liberer_avl_recherche(n->gauche);
@@ -409,6 +468,8 @@ void liberer_avl_recherche(Noeud_AVL_Recherche *n) {
     free(n->id_acteur_key);
     free(n);
 }
+
+
 void liberer_graphe_complet(Graphe_Global *graphe) {
     if (graphe == NULL) return;
     liberer_avl_recherche(graphe->racine_avl);
