@@ -104,7 +104,7 @@ Arbre_Graphe_AVL *double_rotation_gauche_graphe(Arbre_Graphe_AVL *a);
 Arbre_Graphe_AVL *double_rotation_droite_graphe(Arbre_Graphe_AVL *a);
 int avl_facteur_equilibre_graphe(Arbre_Graphe_AVL *n);
 Arbre_Graphe_AVL *equilibrer_graphe(Arbre_Graphe_AVL *n); 
-Arbre_Graphe_AVL *avl_inserer_graphe(Arbre_Graphe_AVL *racine, char *id, Arbre_Noeud *noeud, int *h);
+Noeud_AVL_Recherche* avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h);
 Arbre_Noeud *avl_rechercher_graphe(Arbre_Graphe_AVL *racine, char *id);
 Arbre_Graphe_AVL *creer_et_inserer_noeud(Arbre_Graphe_AVL *racine_avl, char *id_noeud);
 
