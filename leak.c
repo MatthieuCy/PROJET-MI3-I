@@ -16,7 +16,7 @@ Noeud_AVL_Recherche* creer_noeud_avl(const char *id_acteur_key, Noeud_Acteur *ad
     nouveau_noeud->adresse_noeud = adresse_noeud;
     nouveau_noeud->gauche = NULL;
     nouveau_noeud->droite = NULL;
-    nouveau_noeud->hauteur = 1; 
+    nouveau_noeud->equilibre = 0; 
     
     return nouveau_noeud;
 }
@@ -42,28 +42,50 @@ int max(int a, int b) {
 }
 
 int avl_recherche_hauteur(Noeud_AVL_Recherche *n) {
-    return n ? n->hauteur : 0;
+    if (n == NULL)
+        return 0;
+
+    int hg = avl_recherche_hauteur(n->gauche);
+    int hd = avl_recherche_hauteur(n->droite);
+
+    if (hg > hd)
+        return 1 + hg;
+    else
+        return 1 + hd;
 }
 
 Noeud_AVL_Recherche* rotation_droite(Noeud_AVL_Recherche *y) {
+    if (y == NULL || y->gauche == NULL)
+        return y;
+
     Noeud_AVL_Recherche *x = y->gauche;
-    Noeud_AVL_Recherche *T2 = x->droite;
+    Noeud_AVL_Recherche *T2 = x->droite; 
     x->droite = y;
     y->gauche = T2;
-    y->hauteur = 1 + max(avl_recherche_hauteur(y->gauche), avl_recherche_hauteur(y->droite));
-    x->hauteur = 1 + max(avl_recherche_hauteur(x->gauche), avl_recherche_hauteur(x->droite));
-    
+    int eq_y = y->equilibre;
+    int eq_x = x->equilibre;
+
+    y->equilibre = eq_y - mini(eq_x, 0) + 1;
+    x->equilibre = maxi(eq_y + 2, eq_y + eq_x + 2, eq_x + 1);
+
     return x;
 }
 
+
 Noeud_AVL_Recherche* rotation_gauche(Noeud_AVL_Recherche *x) {
+    if (x == NULL || x->droite == NULL)
+        return x;
+
     Noeud_AVL_Recherche *y = x->droite;
     Noeud_AVL_Recherche *T2 = y->gauche;
     y->gauche = x;
     x->droite = T2;
-    x->hauteur = 1 + max(avl_recherche_hauteur(x->gauche), avl_recherche_hauteur(x->droite));
-    y->hauteur = 1 + max(avl_recherche_hauteur(y->gauche), avl_recherche_hauteur(y->droite));
-    
+    int eq_x = x->equilibre;
+    int eq_y = y->equilibre;
+
+    x->equilibre = eq_x - maxi(eq_y, 0) - 1;
+    y->equilibre = mini(eq_x - 2, eq_x + eq_y - 2, eq_y - 1);
+
     return y;
 }
 
@@ -77,21 +99,24 @@ int avl_recherche_facteur_equilibre(Noeud_AVL_Recherche *n) {
 Noeud_AVL_Recherche* equilibrer_noeud(Noeud_AVL_Recherche *n) {
     if (!n) return n;
 
-    n->hauteur = 1 + max(avl_recherche_hauteur(n->gauche), avl_recherche_hauteur(n->droite));
     int eq = avl_recherche_facteur_equilibre(n);
 
     if (eq > 1 && avl_recherche_facteur_equilibre(n->gauche) >= 0)
         return rotation_droite(n);
+    
     if (eq > 1 && avl_recherche_facteur_equilibre(n->gauche) < 0) {
         n->gauche = rotation_gauche(n->gauche);
         return rotation_droite(n);
     }
+    
     if (eq < -1 && avl_recherche_facteur_equilibre(n->droite) <= 0)
         return rotation_gauche(n);
+    
     if (eq < -1 && avl_recherche_facteur_equilibre(n->droite) > 0) {
         n->droite = rotation_droite(n->droite);
         return rotation_gauche(n);
     }
+
     return n;
 }
 
