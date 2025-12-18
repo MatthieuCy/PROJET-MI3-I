@@ -98,13 +98,13 @@ int ajouter_troncon(Arbre_Noeud *source, Arbre_Graphe_AVL *racine_avl, char *cib
 // Fonctions de manipulation de l'AVL du Graphe
 int avl_graphe_hauteur(Arbre_Graphe_AVL *n);
 Arbre_Graphe_AVL *avl_graphe_nouveau_noeud(char *id, Arbre_Noeud *noeud);
-Arbre_Graphe_AVL *rotation_droite_graphe(Arbre_Graphe_AVL *y);
-Arbre_Graphe_AVL *rotation_gauche_graphe(Arbre_Graphe_AVL *x);
-Arbre_Graphe_AVL *double_rotation_gauche_graphe(Arbre_Graphe_AVL *a);
-Arbre_Graphe_AVL *double_rotation_droite_graphe(Arbre_Graphe_AVL *a);
+Noeud_AVL_Recherche *rotation_droite_graphe(Arbre_Graphe_AVL *y);
+Noeud_AVL_Recherche *rotation_gauche_graphe(Arbre_Graphe_AVL *x);
+Noeud_AVL_Recherche *double_rotation_gauche_graphe(Arbre_Graphe_AVL *a);
+Noeud_AVL_Recherche *double_rotation_droite_graphe(Arbre_Graphe_AVL *a);
 int avl_facteur_equilibre_graphe(Arbre_Graphe_AVL *n);
-Arbre_Graphe_AVL *equilibrer_graphe(Arbre_Graphe_AVL *n); 
-Noeud_AVL_Recherche* avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h);
+Noeud_AVL_Recherche *equilibrer_graphe(Arbre_Graphe_AVL *n); 
+Noeud_AVL_Recherche *avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h);
 Arbre_Noeud *avl_rechercher_graphe(Arbre_Graphe_AVL *racine, char *id);
 Arbre_Graphe_AVL *creer_et_inserer_noeud(Arbre_Graphe_AVL *racine_avl, char *id_noeud);
 
