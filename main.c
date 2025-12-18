@@ -1,39 +1,40 @@
 #include "avl.h"
 
 int main(int argc, char *argv[]) {
-    // Le script Shell doit envoyer les bons arguments
-    // Exemple : ./wildwater <mode> <fichier_dat> <option/ID>
     if (argc < 4) {
-        fprintf(stderr, "Erreur : Arguments insuffisants.\n");
-        return 1; // Code erreur positif 
+        fprintf(stderr, "Usage: %s <mode> <fichier_entree> <option_ou_id>\n", argv[0]);
+        return 1; // Code erreur positif requis par le PDF
     }
 
-    char *mode = argv[1];         // "histo" ou "leaks"
-    char *fichier_donnees = argv[2];
-    char *param = argv[3];        // option (max/src/real) ou ID usine
+    char *mode = argv[1];
+    char *fichier_entree = argv[2]; // Devient dynamique
+    char *param = argv[3];
 
     if (strcmp(mode, "histo") == 0) {
-        // Traitement Histogramme [cite: 412]
-        AVL_Usine *racine = lire_donnees_et_construire_avl(fichier_donnees);
+        // On passe le nom du fichier à la fonction de lecture
+        AVL_Usine *racine = lire_donnees_et_construire_avl(fichier_entree);
         if (!racine) return 2;
-        
-        // Le nom du fichier de sortie doit être unique selon l'option [cite: 431]
-        char nom_sortie[100];
-        sprintf(nom_sortie, "vol_%s.dat", param);
-        
-        generer_histogramme(racine, nom_sortie);
-        liberer_avl_usine(racine); // Libération obligatoire [cite: 491, 534]
+
+        if (generer_histogramme(racine, param) != 0) {
+            liberer_avl_usine(racine);
+            return 3;
+        }
+        liberer_avl_usine(racine);
     } 
     else if (strcmp(mode, "leaks") == 0) {
-        // Traitement Fuites [cite: 435]
-        AVL_Usine *racine_usine = lire_donnees_et_construire_avl(fichier_donnees);
-        Graphe_Global *graphe = construire_graphe_distribution(fichier_donnees);
+        AVL_Usine *racine_usine = lire_donnees_et_construire_avl(fichier_entree);
+        // On passe aussi le fichier au graphe
+        Graphe_Global *graphe = construire_graphe_distribution(fichier_entree);
         
-        // calcul_rendement doit gérer le retour -1 si ID non trouvé [cite: 440]
-        calculer_rendement_distribution(param, racine_usine, graphe, "leaks_history.dat");
+        // calculer_rendement_distribution doit écrire "ID;-1.00" si ID non trouvé
+        double res = calculer_rendement_distribution(param, racine_usine, graphe, "leaks_history.dat");
         
         liberer_avl_usine(racine_usine);
         liberer_graphe_complet(graphe);
+        
+        if (res < 0) return 4; // Erreur si l'ID n'existe pas
+    } else {
+        return 5;
     }
 
     return 0; // Succès
