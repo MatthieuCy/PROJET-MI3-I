@@ -1,4 +1,5 @@
 #include "avl.h"
+#include "avl_usine.c"
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {
