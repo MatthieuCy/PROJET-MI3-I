@@ -1,5 +1,6 @@
 #include "avl.h"
 #include "avl_usine.c"
+#include "leak.c"
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {
