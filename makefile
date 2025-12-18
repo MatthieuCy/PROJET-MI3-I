@@ -1,37 +1,33 @@
-# Makefile - Compilation du programme C
-
 CC=gcc
-# -g est ajouté pour permettre le débogage (Valgrind/GDB)
+# -g : essentiel pour valgrind (fuites mémoire)
+# -lm : nécessaire pour la bibliothèque mathématique si vous utilisez des arrondis
 CFLAGS=-Wall -Wextra -std=c99 -g
+LDFLAGS=-lm
 
-# Liste des fichiers
-SRC=avl_usine.c leak.c
+# Liste de TOUS les modules (ajoutez main.o ici)
+SRC=main.c avl_usine.c leak.c
 OBJ=$(SRC:.c=.o)
-# Ajoute tes fichiers .h ici pour que Make surveille les changements
+
+# Fichiers d'en-tête pour surveiller les modifications
 DEPS=avl_usine.h leak.h
+
 TARGET=wildwater
 
-# Règle par défaut
+# Règle principale (doit être la première)
 all: $(TARGET)
 
-# Lien de l'exécutable
 $(TARGET): $(OBJ)
-	@echo "-> Lien de l'executable $(TARGET)..."
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) -lm
+	@echo "-> Création de l'exécutable $(TARGET)..."
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
-# Règle pour compiler les fichiers objet
-# $< représente le fichier .c et $@ le fichier .o
+# Compilation des fichiers .o en vérifiant les .h
 %.o: %.c $(DEPS)
-	@echo "-> Compilation de $<..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Règle pour tout recompiler proprement
-re: clean all
-
-.PHONY: clean re all
-
+# Nettoyage des fichiers temporaires uniquement
+.PHONY: clean
 clean:
-	@echo "Nettoyage des fichiers..."
+	@echo "Nettoyage des fichiers objets et de l'exécutable..."
 	rm -f $(TARGET) $(OBJ)
 	rm -rf histo_outputs
-	rm -f leaks_history.dat c-wildwater_v3.dat histo_data_*.dat
+	# On ne supprime PAS le fichier .dat source ici par sécurité
