@@ -108,6 +108,7 @@ Noeud_AVL_Recherche *avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *
 Arbre_Noeud *avl_rechercher_graphe(Arbre_Graphe_AVL *racine, char *id);
 Arbre_Graphe_AVL *creer_et_inserer_noeud(Arbre_Graphe_AVL *racine_avl, char *id_noeud);
 
+
 // Fonctions de libération de mémoire du Graphe
 void supprimer_troncons(Chainon_Troncon *tete);
 void supprimer_arbre_noeud(Arbre_Noeud *n);
