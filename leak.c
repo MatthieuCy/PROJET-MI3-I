@@ -402,7 +402,7 @@ double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_u
     
     AVL_Usine *noeud_usine = avl_rechercher_usine(racine_usine_avl, id_usine);
     double volume_depart_km3 = 0.0;
-    double total_pertes_km3 = 0.0; // Accumulation en k.m³ (milliers de m³)
+    double total_pertes_km3 = 0.0; 
 
     if (noeud_usine != NULL) {
         volume_depart_km3 = noeud_usine->donnees.volume_reel;
@@ -410,35 +410,39 @@ double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_u
         int nb_stockages = compter_stockages(graphe->racine_avl, id_usine);
 
         if (nb_stockages > 0) {
+            // Distribution équitable du volume entre les points de stockage
             double volume_par_stockage = volume_depart_km3 / (double)nb_stockages;
+        
             parcourir_stockages_et_propager(graphe->racine_avl, id_usine, volume_par_stockage, &total_pertes_km3);
         }
     }
 
-    FILE *fic_out = fopen(nom_fichier_sortie, "a+");
+    FILE *fic_out = fopen(nom_fichier_sortie, "a+"); // "a+" pour ajouter sans écraser
     if (fic_out == NULL) { 
-        printf("ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
+        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
         return -2.0; 
     }
 
+    // Vérification si le fichier est vide pour écrire l'entête
     fseek(fic_out, 0, SEEK_END);
     if (ftell(fic_out) == 0) {
         fprintf(fic_out, "identifiant;Volume_perdu (M.m3.year-1)\n");
     }
     
-    double volume_perdu_mm3 = total_pertes_km3 / CONVERSION_KM3_TO_MM3;
+    double volume_perdu_final = total_pertes_km3 / CONVERSION_KM3_TO_MM3;
 
+    // 4. Cas où l'ID n'est pas trouvé 
     if (noeud_usine == NULL) {
-        fprintf(fic_out, "%s;-1.00\n", id_usine);
+        fprintf(fic_out, "%s;-1.00\n", id_usine); 
         fclose(fic_out);
-        return -1.0;
+        return -1.0; 
     } else {
-        fprintf(fic_out, "%s;%.2f\n", id_usine, volume_perdu_mm3); 
+        fprintf(fic_out, "%s;%.2f\n", id_usine, volume_perdu_final); 
     }
     
     fclose(fic_out);
 
-    return volume_perdu_mm3;
+    return volume_perdu_final;
 }
 
 
