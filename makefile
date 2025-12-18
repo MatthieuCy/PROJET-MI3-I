@@ -1,30 +1,37 @@
 # Makefile - Compilation du programme C
 
 CC=gcc
-# Options de compilation : -Wall (Warnings), -Wextra (Extra Warnings), -std=c99 (Standard C)
+# -g est ajouté pour permettre le débogage (Valgrind/GDB)
+CFLAGS=-Wall -Wextra -std=c99 -g
 
-CFLAGS=-Wall -Wextra -std=c99
-
-# Liste des fichiers source C du projet
-SRC=avl_usine.c leak.c 
+# Liste des fichiers
+SRC=avl_usine.c leak.c
 OBJ=$(SRC:.c=.o)
+# Ajoute tes fichiers .h ici pour que Make surveille les changements
+DEPS=avl_usine.h leak.h
 TARGET=wildwater
 
-#  construire l'exécutable
+# Règle par défaut
+all: $(TARGET)
+
+# Lien de l'exécutable
 $(TARGET): $(OBJ)
-	@echo "-> Compilation de l'executable $(TARGET)..."
+	@echo "-> Lien de l'executable $(TARGET)..."
 	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) -lm
 
 # Règle pour compiler les fichiers objet
-%.o: %.c
-	$(CC) $(CFLAGS) -c $<
+# $< représente le fichier .c et $@ le fichier .o
+%.o: %.c $(DEPS)
+	@echo "-> Compilation de $<..."
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Règle pour le nettoyage (avec 'make clean')
-.PHONY: clean
+# Règle pour tout recompiler proprement
+re: clean all
+
+.PHONY: clean re all
+
 clean:
-	@echo "Nettoyage des fichiers objets et de l'executable..."
+	@echo "Nettoyage des fichiers..."
 	rm -f $(TARGET) $(OBJ)
 	rm -rf histo_outputs
-	rm -f leaks_history.dat
-	rm -f c-wildwater_v3.dat
-	rm -f histo_data_*.dat
+	rm -f leaks_history.dat c-wildwater_v3.dat histo_data_*.dat
