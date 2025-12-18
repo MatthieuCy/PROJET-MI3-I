@@ -1,47 +1,33 @@
-#!/bin/bash
-# Script GnuPlot : plot_histo.plt
+#!/usr/bin/gnuplot
 
-# Variables passées par myScript.sh
-INPUT_DATA="$1"      
-TITLE="$2"           
-Y_LABEL="$3"         
-OUTPUT_PNG="$4"      
+# Variables passées par le script Shell
+# $1 : Fichier de données (ex: histo_outputs/bottom50.dat)
+# $2 : Titre du graphique
+# $3 : Label de l'axe Y
+# $4 : Nom du fichier PNG de sortie
 
-# Vérification minimale
-if [ ! -f "$INPUT_DATA" ]; then
-    echo "ERREUR (GnuPlot): Fichier de donnees '$INPUT_DATA' introuvable."
-    exit 1
-fi
+# Configuration de la sortie
+set terminal png size 1200,800 font "arial,10"
+set output ARG4
 
-# Le script principal de GnuPlot, généré dynamiquement
-cat << EOF | gnuplot
+# Configuration du format
+set datafile separator ";"
+set style data histogram
+set style fill solid border -1
+set boxwidth 0.9
 
-    # Configuration de la sortie et du type de graphique
-    set terminal png size 1200,800 font "arial,10"
-    set output "$OUTPUT_PNG"
+# Titres et labels
+set title ARG2
+set xlabel "Identifiant Usine"
+set ylabel ARG3
 
-    # Configuration du format des données d'entrée
-    set datafile separator ";"
-    
-    # Configuration de l'histogramme
-    set style data histogram
-    set style fill solid border -1
-    set boxwidth 0.9
+# Esthétique de l'axe X
+set xtics rotate by -45
+set grid y
 
-    # Mise en forme du titre et des axes
-    set title "$TITLE"
-    set xlabel "Identifiant Usine"
-    set ylabel "$Y_LABEL"
-
-    # Ajustement des tics sur l'axe X pour le nom des usines
-    set xtics rotate by -45
-    set auto x
-    set auto y
-
-    # Tracé : Colonne 2 pour la valeur, Colonne 1 pour le label X.
-    plot "$INPUT_DATA" using 2:xticlabels(1) notitle linecolor rgb "blue"
-
-EOF
-
-# Retourne le code de sortie de gnuplot
-exit $?
+# Tracé
+# On utilise ARG1 (le premier argument)
+# using 2:xticlabels(1) signifie : 
+#   - colonne 2 pour la hauteur des barres
+#   - colonne 1 pour les noms sous les barres
+plot ARG1 using 2:xticlabels(1) notitle linecolor rgb "blue"
