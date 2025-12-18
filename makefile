@@ -6,11 +6,11 @@ CC=gcc
 CFLAGS=-Wall -Wextra -std=c99
 
 # Liste des fichiers source C du projet
-SRC=avl_usine.c leak.c arbre.c
+SRC=avl_usine.c leak.c 
 OBJ=$(SRC:.c=.o)
 TARGET=wildwater
 
-# Règle par défaut : construire l'exécutable
+#  construire l'exécutable
 $(TARGET): $(OBJ)
 	@echo "-> Compilation de l'executable $(TARGET)..."
 	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) -lm
@@ -19,7 +19,7 @@ $(TARGET): $(OBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
-# Règle pour le nettoyage (à lancer avec 'make clean')
+# Règle pour le nettoyage (avec 'make clean')
 .PHONY: clean
 clean:
 	@echo "Nettoyage des fichiers objets et de l'executable..."
