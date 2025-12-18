@@ -2,17 +2,27 @@
 
 
 
-int maxi(int a, int b){
-    if(a>=b)    return a;
-    return b;
+int maxi(int a, int b, int c) {
+    int m = a;
+
+    if (b > m)
+        m = b;
+    if (c > m)
+        m = c;
+
+    return m;
 }
 
+int mini(int a, int b, int c) {
+    int m = a;
 
-int mini(int a, int b){
-    if(a<=b)    return a;
-    return b;
+    if (b < m)
+        m = b;
+    if (c < m)
+        m = c;
+
+    return m;
 }
-
 
 Usine creer_usine(const char *id_source, double capacite) {
     Usine u;
