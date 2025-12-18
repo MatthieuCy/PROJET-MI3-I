@@ -37,10 +37,27 @@ Noeud_Acteur* rechercher_avl(Noeud_AVL_Recherche *racine, const char *id_acteur_
     }
 }
 
-int max(int a, int b) {
+int maxi(int a, int b) {
     return (a > b) ? a : b;
 }
+int mini(int a, int b) {
+    return (a < b) ? a : b;
+}
 
+static int max_trois(int a, int b, int c) {
+    int m = a;
+    if (b > m) m = b;
+    if (c > m) m = c;
+    return m;
+}
+
+// Fonction pour trouver le minimum entre trois entiers
+static int min_trois(int a, int b, int c) {
+    int m = a;
+    if (b < m) m = b;
+    if (c < m) m = c;
+    return m;
+}
 int avl_recherche_hauteur(Noeud_AVL_Recherche *n) {
     if (n == NULL)
         return 0;
@@ -66,7 +83,7 @@ Noeud_AVL_Recherche* rotation_droite(Noeud_AVL_Recherche *y) {
     int eq_x = x->equilibre;
 
     y->equilibre = eq_y - mini(eq_x, 0) + 1;
-    x->equilibre = maxi(eq_y + 2, eq_y + eq_x + 2, eq_x + 1);
+    x->equilibre = max_trois(eq_y + 2, eq_y + eq_x + 2, eq_x + 1);
 
     return x;
 }
@@ -84,7 +101,7 @@ Noeud_AVL_Recherche* rotation_gauche(Noeud_AVL_Recherche *x) {
     int eq_y = y->equilibre;
 
     x->equilibre = eq_x - maxi(eq_y, 0) - 1;
-    y->equilibre = mini(eq_x - 2, eq_x + eq_y - 2, eq_y - 1);
+    y->equilibre = min_trois(eq_x - 2, eq_x + eq_y - 2, eq_y - 1);
 
     return y;
 }
