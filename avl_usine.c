@@ -44,11 +44,19 @@ AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
     
     return nouveau_noeud;
 }
+
 int hauteur_noeud(AVL_Usine *noeud) {
     if (noeud == NULL) {
         return 0;
     }
-    return noeud->hauteur;
+
+    int hg = hauteur_noeud(noeud->gauche);
+    int hd = hauteur_noeud(noeud->droite);
+
+    if (hg > hd)
+    return 1 + hg;
+    else
+    return 1 + hd;
 }
 
 
