@@ -1,3 +1,4 @@
+#define _XOPEN_SOURCE 500
 #ifndef AVL_USINE_H
 #define AVL_USINE_H
 
