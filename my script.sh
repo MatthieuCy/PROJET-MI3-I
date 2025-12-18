@@ -60,10 +60,9 @@ if [ $? -ne 0 ]; then
     cleanup_and_exit 2
 fi
 
-# Créer un lien symbolique car le code C utilise un nom hardcodé
+
 ln -sf "$USER_DATA_FILE" "$FICHIER_DONNEES_C"
 
-# Rendre le script GnuPlot exécutable (pour être appelé directement)
 chmod +x "$PLOT_SCRIPT_FILE"
 
 # 4. TRAITEMENT DE LA COMMANDE 'histo'
@@ -126,16 +125,15 @@ if [ "$COMMANDE" == "histo" ]; then
         "${HISTOGRAM_OUT_DIR}/bottom50_${OPTION}.png" 
         
     if [ $? -ne 0 ]; then cleanup_and_exit 7; fi
-
-    # -----------------------------------------------------------
+-
     # GESTION DES 10 PLUS GRANDES USINES
-    # -----------------------------------------------------------
+   
     echo "   Generation du graphique pour les 10 plus grandes usines..."
     
-    # Tri: numérique en ordre inverse (-r) puis prendre les 10 premières (les plus grandes)
+    # Tri: numérique en ordre inverse  puis prendre les 10 premières 
     tail -n +2 "$C_OUTPUT_FILE" | sort -t ';' -k $COLUMN -n -r | head -n 10 > "${HISTOGRAM_OUT_DIR}/top10_${OPTION}.dat"
 
-    # Appel du script GnuPlot (il génère l'image .png)
+    # Appel du script GnuPlot 
     ./"$PLOT_SCRIPT_FILE" "${HISTOGRAM_OUT_DIR}/top10_${OPTION}.dat" \
         "10 plus grandes usines - ${TITLE_Y}" \
         "$TITLE_Y" \
