@@ -44,6 +44,13 @@ AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
     
     return nouveau_noeud;
 }
+int hauteur_noeud(AVL_Usine *noeud) {
+    if (noeud == NULL) {
+        return 0;
+    }
+    return noeud->hauteur;
+}
+
 
 int get_facteur_equilibre(AVL_Usine *noeud) {
     if (noeud == NULL) {
@@ -77,13 +84,6 @@ void avl_supprimer(AVL_Usine *racine) {
     avl_supprimer(racine->droite);
     free(racine->donnees.id);  
     free(racine);
-}
-
-int hauteur_noeud(AVL_Usine *noeud) {
-    if (noeud == NULL) {
-        return 0;
-    }
-    return noeud->hauteur;
 }
 
 
