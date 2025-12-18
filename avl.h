@@ -133,7 +133,8 @@ AVL_Usine *avl_rechercher_usine(AVL_Usine *racine, const char *id);
 void avl_supprimer_usine(AVL_Usine *racine); // Libération mémoire
 
 // Fonctions de lecture et sortie
-AVL_Usine *lire_donnees_et_construire_avl();
+AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier);
+void liberer_avl_usine(AVL_Usine *racine);
 int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie);
 
 
