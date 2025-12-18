@@ -303,7 +303,7 @@ Graphe_Global* construire_graphe_distribution() {
             if (stockage == NULL) break;
             
             h = 0;
-            graphe->racine_avl = inserer_avl_graphe(graphe->racine_avl, c3, stockage, &h);
+            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, stockage, &h);
             if (graphe->racine_avl == NULL) break;
         
         }
@@ -322,7 +322,7 @@ Graphe_Global* construire_graphe_distribution() {
             if (enfant_acteur == NULL) break;
 
             h = 0;
-            graphe->racine_avl = inserer_avl_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
+            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
             if (graphe->racine_avl == NULL) break;
 
         
