@@ -2,26 +2,16 @@
 
 
 
-static int maxi(int a, int b, int c) {
-    int m = a;
-
-    if (b > m)
-        m = b;
-    if (c > m)
-        m = c;
-
-    return m;
+int maxi(int a, int b) {
+    if (a >= b)
+        return a;
+    return b;
 }
 
-static int mini(int a, int b, int c) {
-    int m = a;
-
-    if (b < m)
-        m = b;
-    if (c < m)
-        m = c;
-
-    return m;
+int mini(int a, int b) {
+    if (a <= b)
+        return a;
+    return b;
 }
 
 // Fonction pour trouver le maximum entre trois entiers
