@@ -1,9 +1,12 @@
 #include "avl.h"
 
+
+
 int maxi(int a, int b){
     if(a>=b)    return a;
     return b;
 }
+
 
 int mini(int a, int b){
     if(a<=b)    return a;
@@ -16,7 +19,7 @@ Usine creer_usine(const char *id_source, double capacite) {
 
     u.id = strdup(id_source);
     if (u.id == NULL) {
-       printf(" Erreur d'allocation memoire  \n ");
+       printf(" Erreur d'allocation memoire pour l'ID de l'usine \n ");
         exit(1); 
     }
     
@@ -27,11 +30,12 @@ Usine creer_usine(const char *id_source, double capacite) {
     return u;
 }
 
+
 AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
     AVL_Usine *nouveau_noeud = (AVL_Usine *)malloc(sizeof(AVL_Usine));
     
     if (nouveau_noeud == NULL) { 
-        printf("Echec d'allocation memoire \n");
+        printf("Echec d'allocation memoire pour le noeud AVL \n");
         free(usine_donnees.id);
         exit(1); 
     }
@@ -44,6 +48,7 @@ AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
     
     return nouveau_noeud;
 }
+
 
 int hauteur_noeud(AVL_Usine *noeud) {
     if (noeud == NULL) {
@@ -67,7 +72,135 @@ int get_facteur_equilibre(AVL_Usine *noeud) {
     return hauteur_noeud(noeud->gauche) - hauteur_noeud(noeud->droite);
 }
 
-AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
+
+AVL_Usine *rotation_gauche_usine(AVL_Usine *a) {
+    if (a == NULL || a->droite == NULL) {
+        return a;
+    } 
+    
+    AVL_Usine *pivot;
+    int eq_a, eq_p;
+
+    pivot = a->droite;
+    a->droite = pivot->gauche;
+    pivot->gauche = a;
+
+    eq_a = a->equilibre;
+    eq_p = pivot->equilibre;
+
+    a->equilibre = eq_a - maxi(eq_p, 0) - 1;
+    pivot->equilibre = mini(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
+
+    a = pivot;
+    return a;
+}
+
+
+AVL_Usine *rotation_droite_usine(AVL_Usine *a) {
+    if (a == NULL || a->gauche == NULL) {
+        return a;
+    }
+
+    AVL_Usine *pivot;
+    int eq_a, eq_p;
+
+    pivot = a->gauche;
+    a->gauche = pivot->droite;
+    pivot->droite = a;
+
+    eq_a = a->equilibre;
+    eq_p = pivot->equilibre;
+
+    a->equilibre = eq_a - mini(eq_p, 0) + 1;
+    pivot->equilibre = maxi(eq_a + 2, eq_a + eq_p + 2, eq_p + 1);
+
+    a = pivot;
+    return a;
+}
+
+
+AVL_Usine *double_rotation_gauche_usine(AVL_Usine *a) {
+    if (a == NULL || a->droite == NULL) {
+        return a;
+    }
+    
+    a->droite = rotation_droite_usine(a->droite);
+    return rotation_gauche_usine(a);
+}
+
+
+AVL_Usine *double_rotation_droite_usine(AVL_Usine *a) {
+    if (a == NULL || a->gauche == NULL) {
+        return a;
+    }
+    
+    a->gauche = rotation_gauche_usine(a->gauche);
+    return rotation_droite_usine(a);
+}
+
+
+AVL_Usine *equilibrer_usine(AVL_Usine *noeud) {
+    if (noeud == NULL) {
+        return NULL;
+    }
+    
+    if (noeud->equilibre >= 2) {
+        if (noeud->droite->equilibre >=0) {
+             return rotation_gauche_usine(noeud);
+        } 
+        else {
+            return double_rotation_gauche_usine(noeud);
+        }
+    } 
+    else if (noeud->equilibre <= -2) {
+        if(noeud->gauche->equilibre <=0) {
+             return rotation_droite_usine(noeud);
+        }
+        else {
+             return double_rotation_droite_usine(noeud);
+        }     
+    }
+    return noeud;
+}  
+
+  
+
+AVL_Usine *avl_inserer_usine(AVL_Usine *a, Usine u, int *h) {
+    if (a == NULL) {
+        *h = 1;
+        return creer_noeud_usine(u);
+    }
+
+    int comparaison = strcmp(u.id, a->donnees.id);
+
+    if (comparaison < 0) {
+        a->gauche = avl_inserer_usine(a->gauche, u, h);
+        *h = -(*h);
+    } else if (comparaison > 0) {
+        a->droite = avl_inserer_usine(a->droite, u, h);
+    } else {
+        if (u.capacite_max > a->donnees.capacite_max) {
+             a->donnees.capacite_max = u.capacite_max;
+        }       
+        free(u.id);
+        *h = 0;
+        return a; 
+    }
+    if (*h !=0) {
+        a->equilibre = a->equilibre + *h;
+        a = equilibrer_usine(a);
+        if (a->equilibre == 0) {
+            *h = 0;
+        }
+        else {
+             *h = 1;
+        }
+    }
+    return a;
+}
+
+
+AVL_Usine *avl_rechercher_usine(AVL_Usine *racine, const char *id) {
     if (racine == NULL) {
         return NULL; 
     }
@@ -77,9 +210,9 @@ AVL_Usine *avl_rechercher(AVL_Usine *racine, const char *id) {
     if (comparaison == 0) {
         return racine; // Usine trouvée
     } else if (comparaison < 0) {
-        return avl_rechercher(racine->gauche, id); 
+        return avl_rechercher_usine(racine->gauche, id); 
     } else { 
-        return avl_rechercher(racine->droite, id); 
+        return avl_rechercher_usine(racine->droite, id); 
     }
 }
 
@@ -94,93 +227,6 @@ void avl_supprimer(AVL_Usine *racine) {
     free(racine);
 }
 
-
-AVL_Usine *rotation_gauche(AVL_Usine *x) {
-    if (x == NULL || x->droite == NULL) {
-        return x; 
-    }
-
-    AVL_Usine *y = x->droite; 
-    AVL_Usine *T2 = y->gauche;
-
-    y->gauche = x; 
-    x->droite = T2;
-
-    x->hauteur = maxi(hauteur_noeud(x->gauche), hauteur_noeud(x->droite)) + 1;
-    y->hauteur = maxi(hauteur_noeud(y->gauche), hauteur_noeud(y->droite)) + 1;
-    return y;
-}
-
-
-AVL_Usine *rotation_droite(AVL_Usine *y) {
-    if (y == NULL || y->gauche == NULL) {
-        return y;
-    }
-    
-    AVL_Usine *x = y->gauche;
-    AVL_Usine *T2 = x->droite;
-
-    y->gauche = T2;
-    x->droite = y;
-
-    y->hauteur = maxi(hauteur_noeud(y->gauche), hauteur_noeud(y->droite)) + 1;
-    x->hauteur = maxi(hauteur_noeud(x->gauche), hauteur_noeud(x->droite)) + 1;
-    
-    return x;
-}
-
-AVL_Usine *equilibrer(AVL_Usine *noeud) {
-    if (noeud == NULL) {
-        return NULL;
-    }
-
-    noeud->hauteur = maxi(hauteur_noeud(noeud->gauche), hauteur_noeud(noeud->droite)) + 1;
-
-    int equilibre = get_facteur_equilibre(noeud);
-    
-    if (equilibre > 1 && get_facteur_equilibre(noeud->gauche) >= 0) {
-        return rotation_droite(noeud);
-    }
-
-    if (equilibre > 1 && get_facteur_equilibre(noeud->gauche) < 0) {
-        noeud->gauche = rotation_gauche(noeud->gauche);
-        return rotation_droite(noeud);
-    }
-
-    if (equilibre < -1 && get_facteur_equilibre(noeud->droite) <= 0) {
-        return rotation_gauche(noeud);
-    }
-
-    if (equilibre < -1 && get_facteur_equilibre(noeud->droite) > 0) {
-        noeud->droite = rotation_droite(noeud->droite);
-        return rotation_gauche(noeud);
-    }
-
-    return noeud;
-}
-  
-
-
-AVL_Usine *avl_inserer(AVL_Usine *racine, Usine u) {
-    if (racine == NULL) {
-        return creer_noeud_usine(u);
-    }
-
-    int comparaison = strcmp(u.id, racine->donnees.id);
-
-    if (comparaison < 0) {
-        racine->gauche = avl_inserer(racine->gauche, u);
-    } else if (comparaison > 0) {
-        racine->droite = avl_inserer(racine->droite, u);
-    } else {
-        if (u.capacite_max > racine->donnees.capacite_max) {
-             racine->donnees.capacite_max = u.capacite_max;
-             free(u.id);
-        }        
-        return racine; 
-    }
-    return equilibrer(racine);
-}
 
 //Lit le fichier de données et construit un AVL contenant les usines.
 
@@ -223,8 +269,9 @@ AVL_Usine *lire_donnees_et_construire_avl() {
             double capacite = atof(c4);
 
             // Création de la structure Usine (ID + capacité max) puis  Insertion ou mise à jour de l'usine dans l'AVL
-            Usine u_payload = creer_usine(c2, capacite);
-            racine = avl_inserer(racine, u_payload);
+            Usine u = creer_usine(c2, capacite);
+            int h = 0;
+            racine = avl_inserer_usine(racine, u, &h);
         }
 
         // Cas 2 : source ->usine
@@ -232,7 +279,7 @@ AVL_Usine *lire_donnees_et_construire_avl() {
         else if (strcmp(c1, "-") == 0 &&  strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
 
             // Recherche de l'usine concernée dans l'AVL
-            AVL_Usine *noeud_usine = avl_rechercher(racine, c3);
+            AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
 
             // Si l'usine existe, on met à jour ses volumes
             if (noeud_usine != NULL) {
