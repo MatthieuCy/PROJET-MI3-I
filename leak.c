@@ -87,7 +87,7 @@ int avl_recherche_facteur_equilibre(Noeud_AVL_Recherche *n) {
 }
 
 
-Noeud_AVL_Recherche* rotation_droite_graphe(Noeud_AVL_Recherche *a) {
+Noeud_AVL_Recherche *rotation_droite_graphe(Noeud_AVL_Recherche *a) {
     if (a == NULL || a->gauche == NULL) {
         return a;
     }
@@ -110,7 +110,7 @@ Noeud_AVL_Recherche* rotation_droite_graphe(Noeud_AVL_Recherche *a) {
 }
 
 
-Noeud_AVL_Recherche* rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
+Noeud_AVL_Recherche *rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
     if (a == NULL || a->droite == NULL) {
         return a;
     } 
@@ -133,7 +133,7 @@ Noeud_AVL_Recherche* rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
 }
 
 
-Noeud_AVL_Recherche* double_rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
+Noeud_AVL_Recherche *double_rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
     if (a == NULL || a->droite == NULL) {
         return a;
     }
@@ -143,7 +143,7 @@ Noeud_AVL_Recherche* double_rotation_gauche_graphe(Noeud_AVL_Recherche *a) {
 }
 
 
-Noeud_AVL_Recherche* double_rotation_droite_graphe(Noeud_AVL_Recherche *a) {
+Noeud_AVL_Recherche *double_rotation_droite_graphe(Noeud_AVL_Recherche *a) {
     if (a == NULL || a->gauche == NULL) {
         return a;
     }
@@ -153,7 +153,7 @@ Noeud_AVL_Recherche* double_rotation_droite_graphe(Noeud_AVL_Recherche *a) {
 }
 
 
-Noeud_AVL_Recherche* equilibrer_graphe(Noeud_AVL_Recherche *noeud) {
+Noeud_AVL_Recherche *equilibrer_graphe(Noeud_AVL_Recherche *noeud) {
     if (noeud == NULL) {
         return NULL;
     }
@@ -227,7 +227,7 @@ int ajouter_troncon_aval(Noeud_Acteur *parent, Noeud_Acteur *enfant, double fuit
 }
 
 
-Noeud_AVL_Recherche* avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h) {
+Noeud_AVL_Recherche *avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *id_acteur_key, Noeud_Acteur *adresse_noeud, int *h) {
     if (noeud == NULL) {
         *h = 1;
         return creer_noeud_avl(id_acteur_key, adresse_noeud);
