@@ -113,7 +113,7 @@ void supprimer_troncons(Chainon_Troncon *tete);
 void supprimer_arbre_noeud(Arbre_Noeud *n);
 void avl_graphe_suppression(Arbre_Graphe_AVL *racine);
 void supprimer_noeuds_depuis_avl(Arbre_Graphe_AVL *racine);
-void supprimer_graphe_complet(Arbre_Graphe_AVL *racine_avl);
+void librerer_graphe_complet(Arbre_Graphe_AVL *racine_avl);
 
 
 // PROTOTYPES - AVL_USINE.C 
