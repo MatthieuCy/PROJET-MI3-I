@@ -66,7 +66,7 @@ AVL_Usine *creer_noeud_usine(Usine usine_donnees) {
 }
 
 
-int hauteur_noeud(AVL_Usine *noeud) {
+int hauteur_noeud_usine(AVL_Usine *noeud) {
     if (noeud == NULL) {
         return 0;
     }
@@ -81,7 +81,7 @@ int hauteur_noeud(AVL_Usine *noeud) {
 }
 
 
-int get_facteur_equilibre(AVL_Usine *noeud) {
+int avl_facteur_equilibre_usine(AVL_Usine *noeud) {
     if (noeud == NULL) {
         return 0;
     }
