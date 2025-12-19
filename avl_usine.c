@@ -160,7 +160,7 @@ AVL_Usine *equilibrer_usine(AVL_Usine *noeud) {
         return NULL;
     }
     
-    if (noeud->equilibre >= 2) {
+    if (noeud->equilibre >= 2 && noeud->droite) {
         if (noeud->droite->equilibre >=0) {
              return rotation_gauche_usine(noeud);
         } 
