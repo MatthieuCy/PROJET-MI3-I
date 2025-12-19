@@ -1,33 +1,30 @@
-#!/usr/bin/gnuplot
+#!/usr/bin/gnuplot -persist
 
-# Variables passées par le script Shell
-# $1 : Fichier de données (ex: histo_outputs/bottom50.dat)
-# $2 : Titre du graphique
-# $3 : Label de l'axe Y
-# $4 : Nom du fichier PNG de sortie
+# ARG1 : Fichier de données (.dat)
+# ARG2 : Titre du graphique (Texte)
+# ARG3 : Label de l'axe Y (Texte)
+# ARG4 : Fichier de sortie (.png)
 
-# Configuration de la sortie
-set terminal png size 1200,800 font "arial,10"
+# 1. Configuration de la sortie
+set terminal png size 1200,800 font "arial,11"
 set output ARG4
 
-# Configuration du format
+# 2. Formatage des données
 set datafile separator ";"
-set style data histogram
-set style fill solid border -1
-set boxwidth 0.9
+set style data histograms
+set style fill solid 0.6 border -1
+set boxwidth 0.8
 
-# Titres et labels
-set title ARG2
-set xlabel "Identifiant Usine"
-set ylabel ARG3
+# 3. Décoration et titres
+set title ARG2 font "arial,16"
+set xlabel "Identifiants des Usines" font "arial,12"
+set ylabel ARG3 font "arial,12"
 
-# Esthétique de l'axe X
-set xtics rotate by -45
+# 4. Grille et axes
 set grid y
+set yrange [0:*] # L'axe Y commence toujours à 0
+set xtics rotate by -45 # Rotation pour éviter que les IDs se chevauchent
 
-# Tracé
-# On utilise ARG1 (le premier argument)
-# using 2:xticlabels(1) signifie : 
-#   - colonne 2 pour la hauteur des barres
-#   - colonne 1 pour les noms sous les barres
-plot ARG1 using 2:xticlabels(1) notitle linecolor rgb "blue"
+# 5. Dessin
+# On utilise la colonne 2 (Capacité) et la colonne 1 pour les labels (ID)
+plot ARG1 using 2:xticlabels(1) notitle linecolor rgb "#1E90FF"
