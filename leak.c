@@ -1,5 +1,6 @@
-#include "avl.h"
 #define _GNU_SOURCE //  nécessaire pour  acceder a strdup
+#include "avl.h"
+
 
 
 static int max(int a, int b) {
