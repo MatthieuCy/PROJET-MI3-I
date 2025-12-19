@@ -289,7 +289,7 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
             int h = 0;
             racine = avl_inserer_usine(racine, u, &h);
         }
-wildwater
+
         // Cas 2 : source ->usine
         
         else if (strcmp(c1, "-") == 0 &&  strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
