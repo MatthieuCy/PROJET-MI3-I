@@ -270,7 +270,6 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
     graphe->racine_avl = NULL;
     graphe->usine_cible = NULL;
 
-   
     FILE *fic = fopen(nom_fichier, "r");
     if (fic == NULL) {
         fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier %s.\n", nom_fichier);
@@ -281,7 +280,7 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
     char line[MAX_LINE_SIZE];
     char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
     int h = 0;
- 
+
     // Saut de la ligne d'entête
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
@@ -289,34 +288,42 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
     }
 
     while (fgets(line, sizeof(line), fic)) {
+        // Lecture des 5 colonnes séparées par des points-virgules
         if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
             continue; 
         }
 
-        if (strcmp(c1, "-") == 0 && strcmp(c5, "-") == 0) {
+        // si  données flux sabsentes: saut ligne
+        if (strcmp(c1, "-") == 0 && strcmp(c2, "-") == 0 && strcmp(c5, "-") == 0) {
             continue;
         }
 
         // Cas 1 : Usine -> Premier acteur 
-       // Utilise strstr : si "Facility complex" est contenu n'importe où dans c2
-        if (strcmp(c1, "-") != 0 && strstr(c2, "Facility complex") != NULL && strcmp(c5, "-") != 0) {
+        // strstr : si "Facility complex" est contenu  dans c2 + vérifi c1 !=  "-" :  car id de l'usine parente
+        if (strcmp(c1, "-") != 0 && strstr(c2, "Facility complex") != NULL) {
+            
+            // crée le premier maillon de la chaîne 
             Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
             if (stockage == NULL) break;
             
             h = 0;
-    
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, stockage, &h);
             if (graphe->racine_avl == NULL) break;
+            
         }
         
-        // Cas 2 : Autres acteurs dans la chaîne de distribution
-        else if (strcmp(c1, "-") != 0 && strcmp(c5, "-") != 0) {
+        // Cas 2 : Autres acteurs (ex: Station -> Station ou Station -> Stockage)
+        else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0) {
+            
+            // recherche du  parent qui  est l'acteur qui envoie l'eau (c2)
             Noeud_Acteur *parent_acteur = rechercher_avl(graphe->racine_avl, c2);
             
+            // Si le parent n'est pas encore dans l'AVL
             if (parent_acteur == NULL) { 
                 continue;
             }
 
+            // Création de l'acteur enfant  (c3)
             Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
             if (enfant_acteur == NULL) break;
 
@@ -324,8 +331,11 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
             if (graphe->racine_avl == NULL) break;
 
-            double fuite_pct = atof(c5);
-            if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
+           
+            if (strcmp(c5, "-") != 0) {
+                double fuite_pct = atof(c5);
+                if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
+            }
         }    
     }
     
