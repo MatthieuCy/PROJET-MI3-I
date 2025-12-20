@@ -216,9 +216,6 @@ AVL_Usine *avl_inserer_usine(AVL_Usine *a, Usine u, int *h) {
 }
 
 
-Voici la fonction mise à jour proprement. J'ai supprimé le bloc qui faisait doublon à la fin pour ne garder que la logique de comparaison basée sur le mode (max, src ou real).
-
-C
 
 // Insertion pour histogramme 
 AVL_Usine* avl_inserer_par_valeur(AVL_Usine* a, Usine u, int* h, const char* mode) {
