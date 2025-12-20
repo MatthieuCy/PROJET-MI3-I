@@ -215,26 +215,50 @@ AVL_Usine *avl_inserer_usine(AVL_Usine *a, Usine u, int *h) {
     return a;
 }
 
-// insertion pour histogramme
-AVL_Usine* avl_inserer_par_valeur(AVL_Usine* a, Usine u, int* h) {
+
+Voici la fonction mise à jour proprement. J'ai supprimé le bloc qui faisait doublon à la fin pour ne garder que la logique de comparaison basée sur le mode (max, src ou real).
+
+C
+
+// Insertion pour histogramme 
+AVL_Usine* avl_inserer_par_valeur(AVL_Usine* a, Usine u, int* h, const char* mode) {
     if (a == NULL) {
         *h = 1;
         return creer_noeud_usine(u);
     }
-    // Comparaison (pour le mode MAX)
-    if (u.capacite_max < a->donnees.capacite_max) {
-        a->gauche = avl_inserer_par_valeur(a->gauche, u, h);
+
+    double val_nouvelle, val_actuelle;
+
+    // choix valeur à comparer selon l'argument du script Shell
+    if (strcmp(mode, "max") == 0) {
+        val_nouvelle = u.capacite_max;
+        val_actuelle = a->donnees.capacite_max;
+    } else if (strcmp(mode, "src") == 0) {
+        val_nouvelle = u.volume_capte;
+        val_actuelle = a->donnees.volume_capte;
+    } else { 
+        val_nouvelle = u.volume_reel;
+        val_actuelle = a->donnees.volume_reel;
+    }
+
+
+    if (val_nouvelle < val_actuelle) {
+        a->gauche = avl_inserer_par_valeur(a->gauche, u, h, mode);
         *h = -(*h);
     } else {
-        a->droite = avl_inserer_par_valeur(a->droite, u, h);
+        a->droite = avl_inserer_par_valeur(a->droite, u, h, mode);
         *h = *h;
     }
 
+    // 3. Équilibrage de l'arbre
     if (*h != 0) {
         a->equilibre += *h;
         a = equilibrer_usine(a);
-        if (a->equilibre == 0) *h = 0;
-        else *h = 1;
+        if (a->equilibre == 0) {
+            *h = 0;
+        } else {
+            *h = 1;
+        }
     }
     return a;
 }
@@ -337,6 +361,7 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
         }
     }
     fclose(fic);
+    
 
     return racine;
 }
@@ -365,15 +390,19 @@ void parcourir_et_ecrire_simple(AVL_Usine *noeud, FILE *fic) {
 
 
 // Fonction qui prend l'arbre ID et remplit l'arbre Valeur
-void transvaser_vers_tri_valeur(AVL_Usine* origine, AVL_Usine** nouvelle_racine) {
+void transvaser_vers_tri_valeur(AVL_Usine* origine, AVL_Usine** nouvelle_racine, const char* mode) {
     if (origine == NULL) return;
     int h = 0;
+    
+    // copie
     Usine copie = origine->donnees;
     copie.id = strdup(origine->donnees.id); 
-    *nouvelle_racine = avl_inserer_par_valeur(*nouvelle_racine, copie, &h);
     
-    transvaser_vers_tri_valeur(origine->gauche, nouvelle_racine);
-    transvaser_vers_tri_valeur(origine->droite, nouvelle_racine);
+    // transmet le mode
+    *nouvelle_racine = avl_inserer_par_valeur(*nouvelle_racine, copie, &h, mode);
+
+    transvaser_vers_tri_valeur(origine->gauche, nouvelle_racine, mode);
+    transvaser_vers_tri_valeur(origine->droite, nouvelle_racine, mode);
 }
 
 
@@ -388,27 +417,32 @@ void liberer_avl_usine(AVL_Usine *racine) {
 }
 
 
+
 // Fonction  qui génère un fichier CSV à partir d’un AVL d’usines pourr tracer un histogramme des capacités et volumes traités.
-int generer_histogramme(AVL_Usine *racine_id, const char *nom_fichier_sortie) {
+int generer_histogramme(AVL_Usine *racine_id, const char *nom_fichier_sortie, const char *mode) {
     if (racine_id == NULL) {
         printf("AVL vide.\n");
         return 0;
     }
-    // creation racine pour larbre trie
+    
     AVL_Usine* racine_triee = NULL;
-    transvaser_vers_tri_valeur(racine_id, &racine_triee);
+    // transvasement mode choisi (max, src ou real)
+    transvaser_vers_tri_valeur(racine_id, &racine_triee, mode);
 
-    //  On écrit dans le fichier (ordre croissant)
     FILE *fic_out = fopen(nom_fichier_sortie, "w");
     if (fic_out == NULL) {
         printf("ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
+        liberer_avl_usine(racine_triee);
         return 2;
     }
     
+    // En-tête du fichier
     fprintf(fic_out, "identifiant_usine;capacite_max (M.m3.year-1);volume_capte (M.m3.year-1);volume_reel (M.m3.year-1)\n");
+    
+    // Écriture triée
     parcourir_et_ecrire_simple(racine_triee, fic_out);
+    
     fclose(fic_out);
-
     liberer_avl_usine(racine_triee);
     return 0;
 }
