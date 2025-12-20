@@ -1,30 +1,34 @@
 #!/usr/bin/gnuplot -persist
 
-# ARG1 : Fichier de données (.dat)
-# ARG2 : Titre du graphique
-# ARG3 : Label Y
-# ARG4 : Fichier de sortie (.png)
+# ARG1 : Fichier .dat | ARG2 : Titre | ARG3 : Label Y | ARG4 : Sortie .png
 
-set terminal png size 1200,800 font "arial,11"
+set terminal pngcairo size 1400,900 font "arial,10"
 set output ARG4
 
+#  Para  style et couleur
 set datafile separator ";"
 set style data histograms
-set style fill solid 0.7 border -1
-set boxwidth 0.8
+set style fill solid 0.8 border -1
+set boxwidth 0.75
+set grid y lc rgb "#E5E5E5"
 
-set title ARG2 font "arial,16"
+#  Titres et marges
+set title ARG2 font "arial,18,bold"
 set xlabel "Identifiants des Usines" font "arial,12"
 set ylabel ARG3 font "arial,12"
+set bmargin 12 # Espace pour les IDs inclinés
+set tmargin 5  # Espace pour les valeurs en haut
 
-set grid y
-set yrange [0:*]
-set xtics rotate by -45 scale 0
+# Échelle +(espace de 15% en haut pour que les chiffres ne soient pas coupés)
+set offsets 0, 0, graph 0.15, 0 
+set yrange [0:*] 
+set format y "%.0f"
 
-# --- LOGIQUE DE SÉLECTION DE COLONNE ---
-# Si le titre contient "max", on trace la colonne 2
-# Si le titre contient "src", on trace la colonne 3
-# Si le titre contient "real", on trace la colonne 4
+# Rotation des IDs
+set xtics rotate by -45 font "arial,9" scale 0
+
+#  Détection colonne (max=2, src=3, real=4)
 col = (strstrt(ARG2, "max") > 0) ? 2 : (strstrt(ARG2, "src") > 0 ? 3 : 4)
 
-plot ARG1 using col:xticlabels(1) title "Valeur Mesurée" linecolor rgb "#1E90FF"
+#  Dessin 
+plot ARG1 using col:xticlabels(1) lc variable title "Valeur" linecolor rgb "#4682B4", \'' using 0:col:col with labels font "arial,9,bold" offset 0,0.8 notitle
