@@ -50,8 +50,8 @@ if [ "$COMMAND" == "histo" ]; then
 
     TEMP_RAW="temp_c_output.dat"
     
-    # Appel du programme C
-    $EXECUTABLE "$DATA_FILE" "$COMMAND" "$PARAM" "$TEMP_RAW"
+    # Appel du programme C (Arguments réordonnés pour correspondre au main.c)
+    $EXECUTABLE "$COMMAND" "$DATA_FILE" "$PARAM" "$TEMP_RAW"
     
     if [ $? -eq 0 ] && [ -f "$TEMP_RAW" ]; then
         # Définition des noms des fichiers de sortie
@@ -91,8 +91,12 @@ elif [ "$COMMAND" == "leaks" ]; then
         echo "Erreur : Vous devez fournir un ID d'usine."
         exit 4
     fi
-    # Exécution du programme C pour les fuites
-    $EXECUTABLE "$DATA_FILE" "$COMMAND" "$PARAM"
+    # Exécution du programme C pour les fuites (Arguments réordonnés)
+    $EXECUTABLE "$COMMAND" "$DATA_FILE" "$PARAM" "leaks_history.dat"
+    
+    if [ $? -ne 0 ]; then
+        echo "Erreur : Le programme C a échoué."
+    fi
 
 else
     echo "Commande inconnue : $COMMAND (utilisez 'histo' ou 'leaks')"
