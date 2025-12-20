@@ -75,8 +75,8 @@ if [ "$COMMAND" == "histo" ]; then
 
         # Génération des deux graphiques avec Gnuplot
         echo "Lancement de Gnuplot..."
-        gnuplot -c ./plot_histo.plt "$DATA_MIN" "50 plus petites usines ($PARAM)" "Volume/Capacité" "$IMG_MIN"
-        gnuplot -c ./plot_histo.plt "$DATA_MAX" "10 plus grandes usines ($PARAM)" "Volume/Capacité" "$IMG_MAX"
+        gnuplot -c ./plot_histo.plt "$DATA_MIN" "50 plus petites usines ($PARAM)" "Volume(k.m3.year-1)" "$IMG_MIN"
+        gnuplot -c ./plot_histo.plt "$DATA_MAX" "10 plus grandes usines ($PARAM)" "Volume(k.m3.year-1)" "$IMG_MAX"
         
         echo "Succès ! Images créées dans le dossier histo_outputs."
         rm "$TEMP_RAW"
