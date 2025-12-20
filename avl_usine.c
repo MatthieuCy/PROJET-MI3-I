@@ -321,41 +321,40 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
             continue;
         }
 
-        //Cas 1 : Définition d'une usine  et sa capa max
-        
-        if (strcmp(c1, "-") == 0 &&  strcmp(c3, "-") == 0 &&  strcmp(c5, "-") == 0) {
+    
+       // Cas 1 : Détection et création de l'Usine (Capacité Max)
+       //  strstr pour vérifier si "Facility complex" est présent dans c2
+       if (strcmp(c1, "-") == 0 && strstr(c2, "Facility complex") != NULL && strcmp(c3, "-") == 0 && strcmp(c5, "-") == 0) {
 
-            //  convertion de la capacite max  en nombre réel (double)
-            double capacite = atof(c4);
+         // Conversion de la capacité max
+         double capacite = atof(c4);
 
-            // Création de la structure Usine (ID + capacité max) puis  Insertion ou mise à jour de l'usine dans l'AVL
-            Usine u = creer_usine(c2, capacite);
-            int h = 0;
-            racine = avl_inserer_usine(racine, u, &h);
+        // Création et insertion dans l'AVL
+        Usine u = creer_usine(c2, capacite);
+        int h = 0;
+        racine = avl_inserer_usine(racine, u, &h);
         }
 
-        // Cas 2 : source ->usine
+        // Cas 2 : source -> usine (Volumes et Fuites)
+        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
+
+       // Recherche de l'usine concernée dans l'AVL en utilisant l'ID c3
+       AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+
+       // Si l'usine existe dans notre arbre
+          if (noeud_usine != NULL) {
+
+           // Conversion des valeurs numériques
+           double volume = atof(c4);
+           double fuite_pct = atof(c5);
+
+        double volume_reel_traite = volume * (1.0 - (fuite_pct / 100.0));
+
+        noeud_usine->donnees.volume_capte += volume;
+        noeud_usine->donnees.volume_reel += volume_reel_traite;
+    }
+}
         
-        else if (strcmp(c1, "-") == 0 &&  strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
-
-            // Recherche de l'usine concernée dans l'AVL
-            AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
-
-            // Si l'usine existe, on met à jour ses volumes
-            if (noeud_usine != NULL) {
-
-                // Conversion des valeurs numériques
-                double volume = atof(c4);
-                double fuite_pct = atof(c5);
-
-                // Calcul du volume réellement reçu après pertes
-                double volume_reel_traite =  volume * (1.0 - (fuite_pct / 100.0));
-
-                // Accumulation des volumes dans l'usine
-                noeud_usine->donnees.volume_capte += volume;
-                noeud_usine->donnees.volume_reel += volume_reel_traite;
-            }
-        }
     }
     fclose(fic);
     
