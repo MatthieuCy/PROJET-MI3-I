@@ -24,8 +24,13 @@ int main(int argc, char *argv[]) {
     } 
     else if (strcmp(mode, "leaks") == 0) {
         AVL_Usine *racine_usine = lire_donnees_et_construire_avl(fichier_entree);
+        if (!racine_usine) return 2;
         // On passe aussi le fichier au graphe
         Graphe_Global *graphe = construire_graphe_distribution(fichier_entree);
+        if (!graphe) {
+           liberer_avl_usine(racine_usine);
+           return 3;
+        }
         
         // calculer_rendement_distribution doit écrire "ID;-1.00" si ID non trouvé
         double res = calculer_rendement_distribution(param, racine_usine, graphe, "leaks_history.dat");
