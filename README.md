@@ -27,7 +27,7 @@ Comment executer notre programme:
 -Utiliser commande make
 -Mettre les droits avec chmod +x (ne pas oublier de mettre les droits à plot_histo.plt)
 -Créer un dossier histo_outputs  ou seront afficher les histogrammes avec mkdir
-- Puis executer par exemple : ./myScript.sh c-wildwater_v3.dat histo max (affiche les 10 plus grandes usines et les 50 plus petites
+- Puis executer par exemple : ./myScript.sh c-wildwater_v3.dat histo max (affiche les 10 plus grandes usines et les 50 plus petites)
 
 
 
