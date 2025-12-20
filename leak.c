@@ -298,7 +298,8 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
         }
 
         // Cas 1 : Usine -> Premier acteur 
-        if (strcmp(c1, "-") != 0 && strcmp(c2, "Facility complex") == 0 && strcmp(c5, "-") != 0) {
+       // Utilise strstr : si "Facility complex" est contenu n'importe où dans c2
+        if (strcmp(c1, "-") != 0 && strstr(c2, "Facility complex") != NULL && strcmp(c5, "-") != 0) {
             Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
             if (stockage == NULL) break;
             
