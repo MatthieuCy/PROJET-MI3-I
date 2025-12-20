@@ -31,4 +31,4 @@ set xtics rotate by -45 font "arial,9" scale 0
 col = (strstrt(ARG2, "max") > 0) ? 2 : (strstrt(ARG2, "src") > 0 ? 3 : 4)
 
 #  Dessin 
-plot ARG1 using col:xticlabels(1) lc variable title "Valeur" linecolor rgb "#4682B4", \'' using 0:col:col with labels font "arial,9,bold" offset 0,0.8 notitle
+plot ARG1 using col:xticlabels(1) title "Valeur" linecolor rgb "#4682B4", \ '' using 0:col:col with labels font "arial,9,bold" offset 0,0.8 notitle
