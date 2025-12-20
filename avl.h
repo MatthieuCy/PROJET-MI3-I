@@ -131,13 +131,16 @@ AVL_Usine *double_rotation_gauche_usine(AVL_Usine *a);
 AVL_Usine *double_rotation_droite_usine(AVL_Usine *a);
 AVL_Usine *equilibrer_usine(AVL_Usine *noeud);  
 AVL_Usine *avl_inserer_usine(AVL_Usine *racine, Usine u, int *h);
+AVL_Usine *avl_inserer_par_valeur(AVL_Usine *racine, Usine u, int *h);
 AVL_Usine *avl_rechercher_usine(AVL_Usine *racine, const char *id);
 void avl_supprimer_usine(AVL_Usine *racine); // Libération mémoire
 
 // Fonctions de lecture et sortie
 AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier);
 void liberer_avl_usine(AVL_Usine *racine);
-int generer_histogramme(AVL_Usine *racine, const char *nom_fichier_sortie);
+void parcourir_et_ecrire_simple(AVL_Usine *noeud, FILE *fic);
+void transvaser_vers_tri_valeur(AVL_Usine *origine, AVL_Usine **nouvelle_racine);
+int generer_histogramme(AVL_Usine *racine_id, const char *nom_fichier_sortie);
 Graphe_Global *construire_graphe_distribution(const char *nom_fichier);
 
 
