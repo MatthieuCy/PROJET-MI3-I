@@ -26,10 +26,16 @@ Comment executer notre programme:
 -Faire cd dans le fichier créer
 -Utiliser commande make
 -Mettre les droits avec chmod +x (ne pas oublier de mettre les droits à plot_histo.plt)
--Créer un dossier histo_outputs  ou seront afficher les histogrammes avec mkdir
-- Puis executer par exemple : ./myScript.sh c-wildwater_v3.dat histo max (affiche les 10 plus grandes usines et les 50 plus petites)
+- Puis executer / Liste de tous les exécutions possibles histogramme :
+  
+  ./myScript.sh c-wildwater_v3.dat histo max
+  ./myScript.sh c-wildwater_v3.dat histo real
+  ./myScript.sh c-wildwater_v3.dat histo max
 
-
+   Pour leak :
+  ./myScript.sh c-wildwater_v3.dat leak
+  Si vous voulez tester avec une seule usine précise:
+  ./wildwater leak c-wildwater_v3.dat ID_USINE
 
 Structure du projet
 
