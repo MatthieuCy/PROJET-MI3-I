@@ -464,17 +464,24 @@ void calculer_tous_les_volumes_reels(AVL_Usine *noeud_avl, Graphe_Global *graphe
 
     calculer_tous_les_volumes_reels(noeud_avl->gauche, graphe);
     calculer_tous_les_volumes_reels(noeud_avl->droite, graphe);
+
     double total_pertes = 0.0;
     
-   
+    // On vérifie quelle valeur utiliser comme point de départ
+    // Si volume_capte=0, prendre  capacité max
+    double volume_entree = (noeud_avl->donnees.volume_capte > 0) ? noeud_avl->donnees.volume_capte :  noeud_avl->donnees.capacite_max;
+
     int nb_stockages = compter_stockages(graphe->racine_avl, noeud_avl->donnees.id);
 
-    if (nb_stockages > 0) {
-        //volume  divisé équitablement entre ses points de stockage
-        double volume_par_stockage = noeud_avl->donnees.volume_capte / (double)nb_stockages;
+    if (nb_stockages > 0 && volume_entree > 0) {
+        double volume_par_stockage = volume_entree / (double)nb_stockages;
         parcourir_stockages_et_propager(graphe->racine_avl, noeud_avl->donnees.id, volume_par_stockage, &total_pertes);
+        
+        // mise à juour volume reel
+        noeud_avl->donnees.volume_reel = volume_entree - total_pertes;
+    } else {
+        noeud_avl->donnees.volume_reel = 0.0;
     }
-    noeud_avl->donnees.volume_reel = noeud_avl->donnees.volume_capte - total_pertes;
 }
 
 
