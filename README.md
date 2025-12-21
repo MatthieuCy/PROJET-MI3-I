@@ -53,8 +53,8 @@ Ce que le programme permet de faire :
   - ./myScript.sh c-wildwater_v3.dat histo src
 
 - Pour calculer les pertes d'une usine précise :
- - utilisez la commande suivante avec l'identifiant de l'usine entre guillemets :
-   - ./myScript.sh c-wildwater_v3.dat cat leaks_history.dat "NOM_DE_L_USINE" 
+   - utilisez la commande suivante avec l'identifiant de l'usine entre guillemets :
+       - ./myScript.sh c-wildwater_v3.dat cat leaks_history.dat "NOM_DE_L_USINE" 
 
 
 
