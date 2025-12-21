@@ -298,51 +298,57 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
             continue;
         }
 
-        //  usine  définie quand c1="-" + c3="-" et c4 pas vide.
+        // A: Détection et création de l'Usine ( si  c1="-" ET c3="-" )
         if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
             
-            // crée  noeud racine du graphe 
+            // crée noeud racine du graphe 
             Noeud_Acteur *usine_noeud = creer_noeud_acteur(c2, c2); 
             if (usine_noeud == NULL) break;
             
             h = 0;
-            // On insère l'usine dans l'AVL de recherche du graphe pour pouvoir y lier les enfants plus tard
+            // insère l'usine dans l'AVL de recherche du graphe pour pouvoir y lier les enfants plus tard
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c2, usine_noeud, &h);
             if (graphe->racine_avl == NULL) break;
         }
         
-        // Cas 2 : Autres acteurs (ex: Station -> Station ou Station -> Stockage)
-        else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
-            
-            // recherche parent : acteur qui envoie l'eau (c2)
-            Noeud_Acteur *parent_acteur = rechercher_avl(graphe->racine_avl, c2);
-            
-            // Si parent pas encore dans l'AVL
-            if (parent_acteur == NULL) { 
-                continue;
+        // B : Liens entre acteurs 
+        else {
+            Noeud_Acteur *parent_acteur = NULL;
+            char *id_usine_parente = NULL;
+
+            // si  Ligne type "- ; Usine ; Stockage" 
+            if (strcmp(c1, "-") == 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
+                parent_acteur = rechercher_avl(graphe->racine_avl, c2);
+                id_usine_parente = c2;
+            } 
+            // si Ligne type "Usine ; Parent ; Enfant" 
+            else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
+                parent_acteur = rechercher_avl(graphe->racine_avl, c2);
+                id_usine_parente = c1;
             }
 
-            // Création de l'acteur enfant (c3) rattaché à l'usine parente (c1)
-            Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
-            if (enfant_acteur == NULL) break;
+            // Si on a trouvé un parent et une usine de référence, on crée le lien
+            if (parent_acteur != NULL) {
+                Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, id_usine_parente);
+                if (enfant_acteur == NULL) break;
 
-            h = 0;
-            // insère l'enfant pour  devenir parent à son tour
-            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
-            if (graphe->racine_avl == NULL) break;
-
-        
-            if (strcmp(c5, "-") != 0) {
-                double fuite_pct = atof(c5);
-                if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
+                h = 0;
+                // insère l'enfant dans l'AVL pour qu'il puisse devenir parent à son tour
+                graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
+                
+                // Ajout du tronçon avec fuite si présente
+                if (strcmp(c5, "-") != 0) {
+                    double fuite_pct = atof(c5);
+                    ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct);
+                }
             }
-        }    
+        }
     }
     
     fclose(fic);
     return graphe;
 }
-
+    
 
 int compter_stockages(Noeud_AVL_Recherche *avl_noeud_recherche, const char *id_usine_cible) {
     if (avl_noeud_recherche == NULL) {
