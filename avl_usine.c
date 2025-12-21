@@ -376,12 +376,12 @@ void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
 }
 
 
-// Parcours infixe 
+// Parcours infixe inverse pour ordre alphabétique décroissant
 void parcourir_et_ecrire_simple(AVL_Usine *noeud, FILE *fic) {
     if (noeud == NULL) return;
-    parcourir_et_ecrire_simple(noeud->gauche, fic);
+    parcourir_et_ecrire_simple(noeud->droite, fic);  
     ecrire_ligne_usine(fic, noeud);
-    parcourir_et_ecrire_simple(noeud->droite, fic);
+    parcourir_et_ecrire_simple(noeud->gauche, fic);
 }
 
 
