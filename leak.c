@@ -263,88 +263,49 @@ Noeud_AVL_Recherche *avl_inserer_graphe(Noeud_AVL_Recherche *noeud, const char *
 
 Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
     Graphe_Global *graphe = (Graphe_Global*) malloc(sizeof(Graphe_Global));
-    if (graphe == NULL) {
-        fprintf(stderr, "Erreur : échec d'allocation mémoire pour le Graphe_Global\n");
-        return NULL;
-    }
+    if (!graphe) return NULL;
     graphe->racine_avl = NULL;
-    graphe->usine_cible = NULL;
 
     FILE *fic = fopen(nom_fichier, "r");
-    if (fic == NULL) {
-        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier %s.\n", nom_fichier);
-        free(graphe);
-        return NULL;
-    }
+    if (!fic) { free(graphe); return NULL; }
 
-    char line[MAX_LINE_SIZE];
-    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
+    char line[MAX_LINE_SIZE], c1[99], c2[99], c3[99], c4[99], c5[99];
     int h = 0;
-
-    // Saut de la ligne d'entête
-    if (fgets(line, sizeof(line), fic) == NULL) {
-        fclose(fic);
-        return graphe;
-    }
+    fgets(line, sizeof(line), fic); // Saut entête
 
     while (fgets(line, sizeof(line), fic)) {
-        // Lecture des 5 colonnes séparées par des points-virgules
-        if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
-            continue; 
-        }
+        if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) continue;
 
-        // si données flux sabsentes: saut ligne
-        if (strcmp(c1, "-") == 0 && strcmp(c2, "-") == 0 && strcmp(c5, "-") == 0) {
-            continue;
-        }
-
-        // A: Détection et création de l'Usine ( si  c1="-" ET c3="-" )
+        // 1. GESTION DE L'USINE (Définition de capacité)
         if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
-            
-            // crée noeud racine du graphe 
-            Noeud_Acteur *usine_noeud = creer_noeud_acteur(c2, c2); 
-            if (usine_noeud == NULL) break;
-            
-            h = 0;
-            // insère l'usine dans l'AVL de recherche du graphe pour pouvoir y lier les enfants plus tard
-            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c2, usine_noeud, &h);
-            if (graphe->racine_avl == NULL) break;
-        }
-        
-        // B : Liens entre acteurs 
-        else {
-            Noeud_Acteur *parent_acteur = NULL;
-            char *id_usine_parente = NULL;
-
-            // si  Ligne type "- ; Usine ; Stockage" 
-            if (strcmp(c1, "-") == 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
-                parent_acteur = rechercher_avl(graphe->racine_avl, c2);
-                id_usine_parente = c2;
-            } 
-            // si Ligne type "Usine ; Parent ; Enfant" 
-            else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
-                parent_acteur = rechercher_avl(graphe->racine_avl, c2);
-                id_usine_parente = c1;
-            }
-
-            // Si on a trouvé un parent et une usine de référence, on crée le lien
-            if (parent_acteur != NULL) {
-                Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, id_usine_parente);
-                if (enfant_acteur == NULL) break;
-
+            if (rechercher_avl(graphe->racine_avl, c2) == NULL) {
+                Noeud_Acteur *usine = creer_noeud_acteur(c2, c2);
                 h = 0;
-                // insère l'enfant dans l'AVL pour qu'il puisse devenir parent à son tour
-                graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
-                
-                // Ajout du tronçon avec fuite si présente
-                if (strcmp(c5, "-") != 0) {
-                    double fuite_pct = atof(c5);
-                    ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct);
-                }
+                graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c2, usine, &h);
             }
+        }
+        // 2. GESTION DES LIAISONS (Tuyaux)
+        else if (strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
+            char *id_usine_ref = (strcmp(c1, "-") == 0) ? c2 : c1;
+
+            Noeud_Acteur *parent = rechercher_avl(graphe->racine_avl, c2);
+            if (parent == NULL) {
+                parent = creer_noeud_acteur(c2, id_usine_ref);
+                h = 0;
+                graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c2, parent, &h);
+            }
+            
+            Noeud_Acteur *enfant = rechercher_avl(graphe->racine_avl, c3);
+            if (enfant == NULL) {
+                enfant = creer_noeud_acteur(c3, id_usine_ref);
+                h = 0;
+                graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant, &h);
+            }
+
+            double fuite = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
+            ajouter_troncon_aval(parent, enfant, fuite);
         }
     }
-    
     fclose(fic);
     return graphe;
 }
