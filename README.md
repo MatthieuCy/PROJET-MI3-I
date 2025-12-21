@@ -39,6 +39,8 @@ Ce que le programme permet de faire :
 - c-wildwater_v0.dat : Fichier de données pour les tests.
 
 - .gitignore : Pour ne pas envoyer les fichiers inutiles sur GitHub.
+  
+- Rapport projet. pdf : Contient notre rapport du projet.
 
 
 ### Comment éxecuter notre programme:
