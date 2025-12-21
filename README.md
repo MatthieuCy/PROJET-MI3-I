@@ -1,10 +1,10 @@
- Projet Distribution d’Eau  
-Analyse de données d’un système de distribution d’eau en France  
-(Shell + C)
+ # **Projet C-WildWater : Analyse de Réseaux de Distribution d’Eau**  
+ ## Projet en langage C et Shell.  
 
 
 
- Objectif du projet
+
+ ### Description du projet
 
 Ce projet a pour objectif d’analyser des données issues d’un système de distribution d’eau potable en France.  
 Il permet notamment :
@@ -13,14 +13,14 @@ Il permet notamment :
 - le calcul des pertes d’eau  en aval d’une usine donnée,
 - l’export des résultats sous forme de fichiers CSV et de graphiques PNG.
 
-Le projet repose sur :
+### Le projet repose sur :
 - un script Shell (`myScript.sh`) pour l’orchestration,
 - plusieurs programmes en C
 - Gnuplot pour la visualisation graphique.
 
 
 
-Comment executer notre programme:
+### Comment executer notre programme:
 
 -Cloner le dossier sur votre pc avec git clone
 -Faire cd dans le fichier créer
