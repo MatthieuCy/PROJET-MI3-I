@@ -1,50 +1,63 @@
  # **Projet C-WildWater : Analyse de Réseaux de Distribution d’Eau**  
- ## Projet en langage C et Shell.  
+ ## Projet en C et Shell.  
 
 
 
 
  ### Description du projet
 
-Ce projet a pour objectif d’analyser des données issues d’un système de distribution d’eau potable en France.  
-Il permet notamment :
+Ce projet a pour objectif d’analyser des données issues d’un système de distribution d’eau potable en France.
 
-- la génération d’histogrammes sur les capacités et volumes des usines,
-- le calcul des pertes d’eau  en aval d’une usine donnée,
-- l’export des résultats sous forme de fichiers CSV et de graphiques PNG.
+Ce que le programme permet de faire :
+
+1. Statistiques des Usines (Mode histo).
+On génère des histogrammes basés sur trois types de données :
+
+Capacité (max) : Le débit maximum que l'usine peut traiter.
+
+Entrée (src) : Le volume total capté depuis les sources.
+
+Sortie (real) : Le volume final traité (réel).
+
+2. Calcul des Rendements (Mode leaks).
+Le programme suit le réseau d'une usine vers l'aval pour identifier les fuites.
+
+Enregistrement : Les résultats sont ajoutés dans leaks.dat (Format : ID_Usine; Valeur).
+
+Sécurité : Si l'usine est introuvable, le système renvoie -1 et affiche Facility Complex #INEXISTANT.
 
 ### Le projet repose sur :
-- un script Shell (`myScript.sh`) pour l’orchestration,
-- plusieurs programmes en C
-- Gnuplot pour la visualisation graphique.
+- images : Contient tous les graphiques (PNG) générés.
+
+- main.c : Script principal pour lancer le programme.
+
+- Makefile : Pour la compilation automatique.
+
+- plot_histo.plt : Script Gnuplot pour créer les images.
+
+- avl.h / avl_usine.c : Gestion des structures de données (Arbres AVL).
+
+- main.c / leak.c : Logique de calcul et moteur du programme.
+
+- c-wildwater_v0.dat : Fichier de données pour les tests.
+
+- .gitignore : Pour ne pas envoyer les fichiers inutiles sur GitHub.
 
 
+### Comment éxecuter notre programme:
 
-### Comment executer notre programme:
-
--Cloner le dossier sur votre pc avec git clone
--Faire cd dans le fichier créer
--Utiliser commande make
--Mettre les droits avec chmod +x (ne pas oublier de mettre les droits à plot_histo.plt)
-- Puis executer / Liste de tous les exécutions possibles histogramme :
+- On compile le programme avec la commande make.
   
+- Pour donner les droits d'accès aux scripts on tape chmod +x main.sh plot_histo.plt.
+  
+- Pour l'histogramme , utilisez la commande suivante en choisissant l'une des trois options (max, real ou src) :
   ./myScript.sh c-wildwater_v3.dat histo max
   ./myScript.sh c-wildwater_v3.dat histo real
   ./myScript.sh c-wildwater_v3.dat histo max
 
-   Pour leak :
-  ./myScript.sh c-wildwater_v3.dat leak
-  Si vous voulez tester avec une seule usine précise:
-  ./wildwater leak c-wildwater_v3.dat ID_USINE
-
-Structure du projet
+-Pour calculer les pertes d'une usine précise :
+  utilisez la commande suivante avec l'identifiant de l'usine entre guillemets : ./myScript.sh c-wildwater_v0.dat leaks "NOM_DE_L_USINE" 
 
 
-├── myscipt.sh             # Script principal
-   plot_histo.plt          #Génération des histogrammes
-├── README.md              # Documentation
-│   ├── Makefile
-│   ├── avl.c / avl.h      # Arbres AVL et Histogrammes
-│   ├── leaks.c            # Calcul des fuites
-├── data/                  # Données d’entrée 
+
 │   └── c-wildwater_v3.dat
