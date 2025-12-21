@@ -48,13 +48,13 @@ Ce que le programme permet de faire :
 - Pour donner les droits d'accès aux scripts on tape chmod +x main.sh plot_histo.plt.
   
 - Pour l'histogramme , utilisez la commande suivante en choisissant l'une des trois options (max, real ou src) :
-  ./myScript.sh c-wildwater_v3.dat histo max
-  ./myScript.sh c-wildwater_v3.dat histo real
-  ./myScript.sh c-wildwater_v3.dat histo max
+  - ./myScript.sh c-wildwater_v3.dat histo max
+  - ./myScript.sh c-wildwater_v3.dat histo real
+  - ./myScript.sh c-wildwater_v3.dat histo src
 
 -Pour calculer les pertes d'une usine précise :
  - utilisez la commande suivante avec l'identifiant de l'usine entre guillemets :
- ./myScript.sh c-wildwater_v0.dat leaks "NOM_DE_L_USINE" 
+   - ./myScript.sh c-wildwater_v3.dat cat leaks_history.dat "NOM_DE_L_USINE" 
 
 
 
