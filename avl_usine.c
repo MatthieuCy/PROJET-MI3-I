@@ -322,33 +322,33 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
                 double capacite = atof(c4);
                 Usine u = creer_usine(c2, capacite);
                 int h = 0;
-                racine = avl_inserer_usine(racine, u, &h);
+                if (avl_rechercher_usine(racine, c2) == NULL) {
+                   Usine u = creer_usine(c2, capacite);
+                   int h = 0;
+                   racine = avl_inserer_usine(racine, u, &h);
+                }
+                
             }
         }
 
         // Cas 2 : source -> usine (Volumes captés)
-        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
-            
-            // vérifie  c2  source et c3  usine
-            if ((strstr(c2, "Source") || strstr(c2, "Well") || strstr(c2, "Spring") || strstr(c2, "Fountain"))
-                && (strstr(c3, "Plant") || strstr(c3, "Unit") || strstr(c3, "Module"))) {
+       else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
 
-                // Recherche de l'usine concernée dans l'AVL
-                AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+                int est_usine = (strstr(c3, "Plant") || strstr(c3, "Unit") || strstr(c3, "Module"));
 
-                if (noeud_usine != NULL) {
-                    double volume = atof(c4);
-                    double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
+                if (est_usine) {
+                  AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
 
-                    // Calcul du volume qui entre réellement dans l'usine après la fuite de la source
-                    double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
-                    // On cumule le volume capté total
-                    noeud_usine->donnees.volume_capte += volume_entree_usine;
-                    noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
-                }
-            }
+                 if (noeud_usine != NULL) {
+                     double volume = atof(c4);
+                     double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
+
+            double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
+            noeud_usine->donnees.volume_capte += volume_entree_usine;
+            noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
         }
     }
+}
     fclose(fic);
     return racine;
 }
