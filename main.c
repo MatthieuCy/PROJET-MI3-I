@@ -19,16 +19,6 @@ int main(int argc, char *argv[]) {
         AVL_Usine *racine = lire_donnees_et_construire_avl(fichier_entree);
         if (!racine) return 2;
 
-        // Si le mode est 'real'
-        if (strcmp(param, "real") == 0) {
-            Graphe_Global *graphe = construire_graphe_distribution(fichier_entree);
-            if (graphe) {
-                //  parcourt usines AVL + calcule volume réel via le graphe
-                calculer_tous_les_volumes_reels(racine, graphe);
-                liberer_graphe_complet(graphe);
-            }
-        }
-
         // Génération de l'histogramme 
         if (generer_histogramme(racine, fichier_sortie, param) != 0) {
             liberer_avl_usine(racine);
