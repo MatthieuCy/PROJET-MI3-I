@@ -52,8 +52,9 @@ Ce que le programme permet de faire :
   ./myScript.sh c-wildwater_v3.dat histo max
 
 -Pour calculer les pertes d'une usine précise :
+
   utilisez la commande suivante avec l'identifiant de l'usine entre guillemets : ./myScript.sh c-wildwater_v0.dat leaks "NOM_DE_L_USINE" 
 
 
 
-│   └── c-wildwater_v3.dat
+
