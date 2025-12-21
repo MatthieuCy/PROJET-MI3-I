@@ -1,16 +1,5 @@
 #include "avl.h"
 
-#include <ctype.h>
-
-void trim(char *s) {
-    char *p = s;
-    int l = strlen(p);
-    // Enlever les espaces/retours à la ligne à la fin
-    while(l > 0 && isspace(p[l-1])) p[--l] = 0;
-    // Enlever les espaces au début
-    while(*p && isspace(*p)) ++p, --l;
-    memmove(s, p, l + 1);
-}
 
 static int maxi(int a, int b) {
     if (a >= b)
@@ -324,7 +313,6 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
         if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
             continue;
         }
-        trim(c1); trim(c2); trim(c3); trim(c4); trim(c5);
 
         // Cas 1 : Détection et création de l'Usine (Ligne de capacité)
         if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
