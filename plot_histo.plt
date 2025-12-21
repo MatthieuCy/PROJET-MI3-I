@@ -28,7 +28,7 @@ set format y "%.0f"
 set xtics rotate by -45 font "arial,9" scale 0
 
 #  Détection colonne (max=2, src=3, real=4)
-col = (strstr(ARG2, "max") ? 2 : (strstr(ARG2, "src") ? 3 : 4))
+col = (strstrt(ARG2, "max") >= 0 ? 2 : (strstrt(ARG2, "src") >= 0 ? 3 : 4))
 
 #  Dessin 
 plot ARG1 using col:xticlabels(1) title "Valeur" linecolor rgb "#4682B4", \
