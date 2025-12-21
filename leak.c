@@ -293,45 +293,45 @@ Graphe_Global* construire_graphe_distribution(const char *nom_fichier) {
             continue; 
         }
 
-        // si  données flux sabsentes: saut ligne
+        // si données flux sabsentes: saut ligne
         if (strcmp(c1, "-") == 0 && strcmp(c2, "-") == 0 && strcmp(c5, "-") == 0) {
             continue;
         }
 
-        // Cas 1 : Usine -> Premier acteur 
-        // strstr : si "Facility complex" est contenu  dans c2 + vérifi c1 !=  "-" :  car id de l'usine parente
-        if (strcmp(c1, "-") != 0 && strstr(c2, "Facility complex") != NULL) {
+        //  usine  définie quand c1="-" + c3="-" et c4 pas vide.
+        if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
             
-            // crée le premier maillon de la chaîne 
-            Noeud_Acteur *stockage = creer_noeud_acteur(c3, c1); 
-            if (stockage == NULL) break;
+            // crée  noeud racine du graphe 
+            Noeud_Acteur *usine_noeud = creer_noeud_acteur(c2, c2); 
+            if (usine_noeud == NULL) break;
             
             h = 0;
-            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, stockage, &h);
+            // On insère l'usine dans l'AVL de recherche du graphe pour pouvoir y lier les enfants plus tard
+            graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c2, usine_noeud, &h);
             if (graphe->racine_avl == NULL) break;
-            
         }
         
         // Cas 2 : Autres acteurs (ex: Station -> Station ou Station -> Stockage)
-        else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0) {
+        else if (strcmp(c1, "-") != 0 && strcmp(c2, "-") != 0 && strcmp(c3, "-") != 0) {
             
-            // recherche du  parent qui  est l'acteur qui envoie l'eau (c2)
+            // recherche parent : acteur qui envoie l'eau (c2)
             Noeud_Acteur *parent_acteur = rechercher_avl(graphe->racine_avl, c2);
             
-            // Si le parent n'est pas encore dans l'AVL
+            // Si parent pas encore dans l'AVL
             if (parent_acteur == NULL) { 
                 continue;
             }
 
-            // Création de l'acteur enfant  (c3)
+            // Création de l'acteur enfant (c3) rattaché à l'usine parente (c1)
             Noeud_Acteur *enfant_acteur = creer_noeud_acteur(c3, c1);
             if (enfant_acteur == NULL) break;
 
             h = 0;
+            // insère l'enfant pour  devenir parent à son tour
             graphe->racine_avl = avl_inserer_graphe(graphe->racine_avl, c3, enfant_acteur, &h);
             if (graphe->racine_avl == NULL) break;
 
-           
+        
             if (strcmp(c5, "-") != 0) {
                 double fuite_pct = atof(c5);
                 if (ajouter_troncon_aval(parent_acteur, enfant_acteur, fuite_pct) != 0) break;
