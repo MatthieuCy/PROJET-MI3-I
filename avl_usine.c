@@ -289,23 +289,19 @@ void avl_supprimer(AVL_Usine *racine) {
 
 
 //Lit le fichier de données et construit un AVL contenant les usines.
-
 AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
-
     // Ouverture du fichier de données en lecture
     FILE *fic = fopen(nom_fichier, "r");
     if (fic == NULL) {
-        printf("ERREUR: Le fichier %s est introuvable \n", FICHIER_DONNEES);
+        fprintf(stderr, "ERREUR: Le fichier %s est introuvable \n", nom_fichier);
         return NULL;
     }
 
     AVL_Usine *racine = NULL;
     char line[MAX_LINE_SIZE];
-
-    //stocker les 5 champs séparés par ';'
     char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
 
-    // Saut de la ligne d'en-tête (noms des colonnes) pour eviter decalage et erreur
+    // Saut de la ligne d'en-tête pour eviter decalage
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
         return NULL;
@@ -314,53 +310,49 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
     // Lecture du fichier ligne par ligne
     while (fgets(line, sizeof(line), fic)) {
 
-        // Découpage de la ligne en 5 champs séparés par ';'
-        if (sscanf(line,
-                   "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
-            // Ligne mal formée : on l'ignore 
+        // Découpage de la ligne en 5 champs
+        if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
             continue;
         }
 
-    
-       // Cas 1 : Détection et création de l'Usine (Capacité Max)
-       //  strstr pour vérifier si "Facility complex" est présent dans c2
-       if (strcmp(c1, "-") == 0 && strstr(c2, "Facility complex") != NULL && strcmp(c3, "-") == 0 && strcmp(c5, "-") == 0) {
-
-         // Conversion de la capacité max
-         double capacite = atof(c4);
-
-        // Création et insertion dans l'AVL
-        Usine u = creer_usine(c2, capacite);
-        int h = 0;
-        racine = avl_inserer_usine(racine, u, &h);
+        // Cas 1 : Détection et création de l'Usine (Capacité Max)
+        if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
+            
+            if (strstr(c2, "Plant") || strstr(c2, "Unit") || strstr(c2, "Module") || strstr(c2, "Facility complex")) {
+                double capacite = atof(c4);
+                Usine u = creer_usine(c2, capacite);
+                int h = 0;
+                racine = avl_inserer_usine(racine, u, &h);
+            }
         }
 
-        // Cas 2 : source -> usine (Volumes et Fuites)
-        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c5, "-") != 0) {
+        // Cas 2 : source -> usine (Volumes captés)
+        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
+            
+            // vérifie  c2  source et c3  usine
+            if ((strstr(c2, "Source") || strstr(c2, "Well") || strstr(c2, "Spring") || strstr(c2, "Fountain"))
+                && (strstr(c3, "Plant") || strstr(c3, "Unit") || strstr(c3, "Module"))) {
 
-       // Recherche de l'usine concernée dans l'AVL en utilisant l'ID c3
-       AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+                // Recherche de l'usine concernée dans l'AVL
+                AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
 
-       // Si l'usine existe dans notre arbre
-          if (noeud_usine != NULL) {
+                if (noeud_usine != NULL) {
+                    double volume = atof(c4);
+                    double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
 
-           // Conversion des valeurs numériques
-           double volume = atof(c4);
-           double fuite_pct = atof(c5);
-
-        double volume_reel_traite = volume * (1.0 - (fuite_pct / 100.0));
-
-        noeud_usine->donnees.volume_capte += volume;
-        noeud_usine->donnees.volume_reel += volume_reel_traite;
-    }
-}
-        
+                    // Calcul du volume qui entre réellement dans l'usine après la fuite de la source
+                    double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
+                    // On cumule le volume capté total
+                    noeud_usine->donnees.volume_capte += volume_entree_usine;
+                    noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
+                }
+            }
+        }
     }
     fclose(fic);
-    
-
     return racine;
 }
+
 
 // Détermine comment  écrire la ligne (conversion et formatage correct).
 void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
