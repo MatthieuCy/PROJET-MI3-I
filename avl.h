@@ -144,7 +144,7 @@ int generer_histogramme(AVL_Usine *racine_id, const char *nom_fichier_sortie, co
 Graphe_Global *construire_graphe_distribution(const char *nom_fichier);
 
 
-
+void calculer_tous_les_volumes_reels(AVL_Usine *noeud_avl, Graphe_Global *graphe);
 double calculer_rendement_distribution(const char *id_cible, AVL_Usine *racine_usine, Graphe_Global *graphe, const char *fichier_historique);
 int historique_fuites(const char *nom_fichier, const char *id_usine, double fuites_pct);
 void lire_donnees_et_construire_graphe(Arbre_Graphe_AVL **racine_graphe_avl, AVL_Usine *racine_usine_avl);
