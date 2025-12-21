@@ -385,7 +385,7 @@ double calculer_rendement_distribution(const char *id_usine,  AVL_Usine *racine_
 
     //  Cas où l'ID n'est pas trouvé
     if (noeud_usine == NULL) {
-        FILE *fic_out = fopen(nom_fichier_sortie, "a+");
+        FILE *fic_out = fopen(nom_fichier_sortie, "w");
         if (fic_out != NULL) {
             fseek(fic_out, 0, SEEK_END);
             if (ftell(fic_out) == 0) {
@@ -408,7 +408,7 @@ double calculer_rendement_distribution(const char *id_usine,  AVL_Usine *racine_
         propager_volume_et_calculer_pertes(acteur_usine, volume_depart_km3,  &total_pertes_km3);
     }
 
-    FILE *fic_out = fopen(nom_fichier_sortie, "a+"); // "a+" pour ajouter sans écraser
+    FILE *fic_out = fopen(nom_fichier_sortie, "w"); 
     if (fic_out == NULL) {
         fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n",nom_fichier_sortie);
         return -2.0;
