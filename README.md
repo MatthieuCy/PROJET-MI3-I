@@ -11,25 +11,21 @@ Ce projet a pour objectif d’analyser des données issues d’un système de di
 Ce que le programme permet de faire :
 
 1. Statistiques des Usines (Mode histo).
-On génère des histogrammes basés sur trois types de données :
+   - On génère des histogrammes basés sur trois types de données :
+      - Max : Le débit maximum que l'usine peut traiter.
+      - SRC : Le volume total capté depuis les sources.
+      - REAL : Le volume final traité (réel).
 
-Capacité (max) : Le débit maximum que l'usine peut traiter.
-
-Entrée (src) : Le volume total capté depuis les sources.
-
-Sortie (real) : Le volume final traité (réel).
 
 2. Calcul des Rendements (Mode leaks).
-Le programme suit le réseau d'une usine vers l'aval pour identifier les fuites.
+   - Le mode leaks calcule le volume d'eau perdu entre une usine et les consommateurs en additionnant les fuites de chaque tronçon du réseau. Le résultat est enregistré dans leaks.dat et affiche -1 si l'identifiant de l'usine n'existe pas.
 
-Enregistrement : Les résultats sont ajoutés dans leaks.dat (Format : ID_Usine; Valeur).
-
-Sécurité : Si l'usine est introuvable, le système renvoie -1 et affiche Facility Complex #INEXISTANT.
+     
 
 ### Le projet repose sur :
 - images : Contient tous les graphiques (PNG) générés.
 
-- main.c : Script principal pour lancer le programme.
+- myScript.sh : Script qui gère les erreurs, lance la compilation et pilote les traitements.
 
 - Makefile : Pour la compilation automatique.
 
