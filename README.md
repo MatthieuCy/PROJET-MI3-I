@@ -47,7 +47,7 @@ Ce que le programme permet de faire :
 
 - On compile le programme avec la commande make.
   
-- Pour donner les droits d'accès aux scripts on tape chmod +x main.sh plot_histo.plt.
+- Pour donner les droits d'accès aux scripts on tape chmod +x myScript.sh plot_histo.plt.
   
 - Pour l'histogramme , utilisez la commande suivante en choisissant l'une des trois options (max, real ou src) :
   - ./myScript.sh c-wildwater_v3.dat histo max
