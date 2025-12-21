@@ -377,30 +377,41 @@ void parcourir_stockages_et_propager(Noeud_AVL_Recherche *avl_noeud_recherche, c
 }
 
 
+double calculer_rendement_distribution(const char *id_usine,  AVL_Usine *racine_usine_avl, Graphe_Global *graphe, const char *nom_fichier_sortie) {
 
-double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_usine_avl, Graphe_Global *graphe, const char *nom_fichier_sortie) {
-    
     AVL_Usine *noeud_usine = avl_rechercher_usine(racine_usine_avl, id_usine);
     double volume_depart_km3 = 0.0;
-    double total_pertes_km3 = 0.0; 
+    double total_pertes_km3 = 0.0;
 
-    if (noeud_usine != NULL) {
-        volume_depart_km3 = noeud_usine->donnees.volume_reel;
-        
-        int nb_stockages = compter_stockages(graphe->racine_avl, id_usine);
-
-        if (nb_stockages > 0) {
-            // Distribution équitable du volume entre les points de stockage
-            double volume_par_stockage = volume_depart_km3 / (double)nb_stockages;
-        
-            parcourir_stockages_et_propager(graphe->racine_avl, id_usine, volume_par_stockage, &total_pertes_km3);
+    //  Cas où l'ID n'est pas trouvé
+    if (noeud_usine == NULL) {
+        FILE *fic_out = fopen(nom_fichier_sortie, "a+");
+        if (fic_out != NULL) {
+            fseek(fic_out, 0, SEEK_END);
+            if (ftell(fic_out) == 0) {
+                fprintf(fic_out, "identifiant;Volume_perdu (M.m3.year-1)\n");
+            }
+            fprintf(fic_out, "%s;-1.00\n", id_usine);
+            fclose(fic_out);
         }
+        return -1.0;
+    }
+
+    // Volume d’eau potable après traitement de l’usine
+    volume_depart_km3 = noeud_usine->donnees.volume_reel;
+
+    // Recherche du noeud acteur correspondant à l'usine dans le graphe
+    Noeud_Acteur *acteur_usine = rechercher_avl(graphe->racine_avl, id_usine);
+
+    // Si l'usine existe dans le graphe, on propage le volume dans tout le réseau aval
+    if (acteur_usine != NULL && volume_depart_km3 > 0.0) {
+        propager_volume_et_calculer_pertes(acteur_usine, volume_depart_km3,  &total_pertes_km3);
     }
 
     FILE *fic_out = fopen(nom_fichier_sortie, "a+"); // "a+" pour ajouter sans écraser
-    if (fic_out == NULL) { 
-        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n", nom_fichier_sortie);
-        return -2.0; 
+    if (fic_out == NULL) {
+        fprintf(stderr, "ERREUR: Impossible d'ouvrir le fichier de sortie %s.\n",nom_fichier_sortie);
+        return -2.0;
     }
 
     // Vérification si le fichier est vide pour écrire l'entête
@@ -408,18 +419,12 @@ double calculer_rendement_distribution(const char *id_usine, AVL_Usine *racine_u
     if (ftell(fic_out) == 0) {
         fprintf(fic_out, "identifiant;Volume_perdu (M.m3.year-1)\n");
     }
-    
+
+    // Conversion en millions de m³
     double volume_perdu_final = total_pertes_km3 / CONVERSION_KM3_TO_MM3;
 
-    // 4. Cas où l'ID n'est pas trouvé 
-    if (noeud_usine == NULL) {
-        fprintf(fic_out, "%s;-1.00\n", id_usine); 
-        fclose(fic_out);
-        return -1.0; 
-    } else {
-        fprintf(fic_out, "%s;%.2f\n", id_usine, volume_perdu_final); 
-    }
-    
+    fprintf(fic_out, "%s;%.2f\n", id_usine, volume_perdu_final);
+
     fclose(fic_out);
 
     return volume_perdu_final;
