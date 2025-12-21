@@ -225,7 +225,7 @@ AVL_Usine* avl_inserer_par_valeur(AVL_Usine* a, Usine u, int* h, const char* mod
 
     double val_nouvelle, val_actuelle;
 
-    // choix valeur à comparer selon l'argument du script Shell
+   // choix valeur selon mode
     if (strcmp(mode, "max") == 0) {
         val_nouvelle = u.capacite_max;
         val_actuelle = a->donnees.capacite_max;
@@ -238,26 +238,27 @@ AVL_Usine* avl_inserer_par_valeur(AVL_Usine* a, Usine u, int* h, const char* mod
     }
 
 
-    if (val_nouvelle < val_actuelle) {
+    if (val_nouvelle < val_actuelle || (val_nouvelle == val_actuelle &&  strcmp(u.id, a->donnees.id) < 0)) {
         a->gauche = avl_inserer_par_valeur(a->gauche, u, h, mode);
         *h = -(*h);
     } else {
         a->droite = avl_inserer_par_valeur(a->droite, u, h, mode);
-        *h = *h;
     }
 
-    // 3. Équilibrage de l'arbre
+   // equilibrer avl
     if (*h != 0) {
         a->equilibre += *h;
         a = equilibrer_usine(a);
-        if (a->equilibre == 0) {
+
+        if (a->equilibre == 0)
             *h = 0;
-        } else {
+        else
             *h = 1;
-        }
     }
+
     return a;
 }
+
 
 AVL_Usine *avl_rechercher_usine(AVL_Usine *racine, const char *id) {
     if (racine == NULL) {
@@ -289,69 +290,58 @@ void avl_supprimer(AVL_Usine *racine) {
 
 //Lit le fichier de données et construit un AVL contenant les usines.
 AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
-    // Ouverture du fichier de données en lecture
     FILE *fic = fopen(nom_fichier, "r");
     if (fic == NULL) {
-        fprintf(stderr, "ERREUR: Le fichier %s est introuvable \n", nom_fichier);
+        fprintf(stderr, "ERREUR: Le fichier %s est introuvable\n", nom_fichier);
         return NULL;
     }
 
     AVL_Usine *racine = NULL;
     char line[MAX_LINE_SIZE];
-    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE], c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
+    char c1[MAX_CHAMP_SIZE], c2[MAX_CHAMP_SIZE],c3[MAX_CHAMP_SIZE], c4[MAX_CHAMP_SIZE], c5[MAX_CHAMP_SIZE];
 
-    // Saut de la ligne d'en-tête pour eviter decalage
+    /* Saut de l'en-tête */
     if (fgets(line, sizeof(line), fic) == NULL) {
         fclose(fic);
         return NULL;
     }
 
-    // Lecture du fichier ligne par ligne
     while (fgets(line, sizeof(line), fic)) {
 
-        // Découpage de la ligne en 5 champs
-        if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]", c1, c2, c3, c4, c5) != 5) {
+        if (sscanf(line, "%99[^;];%99[^;];%99[^;];%99[^;];%99[^\n]",
+                   c1, c2, c3, c4, c5) != 5) {
             continue;
         }
 
-        // Cas 1 : Détection et création de l'Usine (Ligne de capacité)
-        if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
-            if (strstr(c2, "Plant") || strstr(c2, "Unit") || strstr(c2, "Module") || strstr(c2, "Facility complex")) {
-                if (avl_rechercher_usine(racine, c2) == NULL) {
-                    double capacite = atof(c4);
-                    Usine u = creer_usine(c2, capacite);
-                    int h = 0;
-                    racine = avl_inserer_usine(racine, u, &h);
-                }
+        //  CAS 1 : DÉFINITION D’UNE USINE (CAPACITÉ MAX)
+        
+        if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0 &&  (strstr(c2, "Plant") || strstr(c2, "Unit") ||strstr(c2, "Module") || strstr(c2, "Facility complex"))) {
+
+            if (avl_rechercher_usine(racine, c2) == NULL) {
+                double capacite = atof(c4);
+                Usine u = creer_usine(c2, capacite);
+                int h = 0;
+                racine = avl_inserer_usine(racine, u, &h);
             }
         }
 
-        // Cas 2 : Ligne de flux (Source -> Usine)
-        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
-            
-            // Si la destination (c3) est une Usine, une Unité ou un Complexe
-            int est_destination_usine = (strstr(c3, "Plant") || strstr(c3, "Unit") ||  strstr(c3, "Module") || strstr(c3, "Facility complex"));
+        // CAS 2 : SOURCE → USINE (CAPTAGE)
+        else if (strcmp(c1, "-") == 0 &&  strcmp(c3, "-") != 0 && strcmp(c4, "-") != 0 && (strstr(c3, "Plant") || strstr(c3, "Unit") ||strstr(c3, "Module") || strstr(c3, "Facility complex"))) {
 
-            if (est_destination_usine) {
-                AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+            AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+            if (noeud_usine != NULL) {
 
-                if (noeud_usine != NULL) {
-                    double volume = atof(c4);
-                    double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
+                double volume_brut = atof(c4);      // volume capté (src)
+                double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
+                double volume_apres_fuite = volume_brut * (1.0 - fuite_pct / 100.0);
 
-                    // Calcul du volume net arrivant à l'usine après fuite du tuyau source
-                    double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
-                    
-                    // Cumul des volumes captés
-                    noeud_usine->donnees.volume_capte += volume_entree_usine;
-                    
-                    // On initialise volume_reel par défaut avec le capté pour éviter les 0.00 en mode src
-                    noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
-                }
+                
+                noeud_usine->donnees.volume_capte += volume_brut;
+                noeud_usine->donnees.volume_reel += volume_apres_fuite;
             }
         }
     }
-    
+
     fclose(fic);
     return racine;
 }
