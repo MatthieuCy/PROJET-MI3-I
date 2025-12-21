@@ -53,7 +53,7 @@ if [ "$COMMAND" == "histo" ]; then
     # Appel du programme C (Arguments réordonnés pour correspondre au main.c)
     $EXECUTABLE "$COMMAND" "$DATA_FILE" "$PARAM" "$TEMP_RAW"
     
-    if [ $? -eq 0 ] && [ -f "$TEMP_RAW" ]; then
+    if [ -f "$TEMP_RAW" ]; then
         # Définition des noms des fichiers de sortie
         DATA_MIN="histo_outputs/data_${PARAM}_min50.dat"
         DATA_MAX="histo_outputs/data_${PARAM}_max10.dat"
