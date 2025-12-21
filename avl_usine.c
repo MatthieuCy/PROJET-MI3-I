@@ -315,44 +315,47 @@ AVL_Usine *lire_donnees_et_construire_avl(const char *nom_fichier) {
             continue;
         }
 
-        // Cas 1 : Détection et création de l'Usine (Capacité Max)
+        // Cas 1 : Détection et création de l'Usine (Ligne de capacité)
         if (strcmp(c1, "-") == 0 && strcmp(c3, "-") == 0 && strcmp(c4, "-") != 0) {
-            
             if (strstr(c2, "Plant") || strstr(c2, "Unit") || strstr(c2, "Module") || strstr(c2, "Facility complex")) {
-                double capacite = atof(c4);
-                Usine u = creer_usine(c2, capacite);
-                int h = 0;
                 if (avl_rechercher_usine(racine, c2) == NULL) {
-                   Usine u = creer_usine(c2, capacite);
-                   int h = 0;
-                   racine = avl_inserer_usine(racine, u, &h);
+                    double capacite = atof(c4);
+                    Usine u = creer_usine(c2, capacite);
+                    int h = 0;
+                    racine = avl_inserer_usine(racine, u, &h);
                 }
-                
             }
         }
 
-        // Cas 2 : source -> usine (Volumes captés)
-       else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
+        // Cas 2 : Ligne de flux (Source -> Usine)
+        else if (strcmp(c1, "-") == 0 && strcmp(c4, "-") != 0 && strcmp(c3, "-") != 0) {
+            
+            // Si la destination (c3) est une Usine, une Unité ou un Complexe
+            int est_destination_usine = (strstr(c3, "Plant") || strstr(c3, "Unit") ||  strstr(c3, "Module") || strstr(c3, "Facility complex"));
 
-                int est_usine = (strstr(c3, "Plant") || strstr(c3, "Unit") || strstr(c3, "Module"));
+            if (est_destination_usine) {
+                AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
 
-                if (est_usine) {
-                  AVL_Usine *noeud_usine = avl_rechercher_usine(racine, c3);
+                if (noeud_usine != NULL) {
+                    double volume = atof(c4);
+                    double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
 
-                 if (noeud_usine != NULL) {
-                     double volume = atof(c4);
-                     double fuite_pct = (strcmp(c5, "-") != 0) ? atof(c5) : 0.0;
-
-            double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
-            noeud_usine->donnees.volume_capte += volume_entree_usine;
-            noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
+                    // Calcul du volume net arrivant à l'usine après fuite du tuyau source
+                    double volume_entree_usine = volume * (1.0 - (fuite_pct / 100.0));
+                    
+                    // Cumul des volumes captés
+                    noeud_usine->donnees.volume_capte += volume_entree_usine;
+                    
+                    // On initialise volume_reel par défaut avec le capté pour éviter les 0.00 en mode src
+                    noeud_usine->donnees.volume_reel = noeud_usine->donnees.volume_capte;
+                }
+            }
         }
     }
-}
+    
     fclose(fic);
     return racine;
 }
-
 
 // Détermine comment  écrire la ligne (conversion et formatage correct).
 void ecrire_ligne_usine(FILE *fic, AVL_Usine *noeud) {
